@@ -4,7 +4,7 @@ declare module 'hono' {
   interface Env {
     Variables: {}
     Bindings: {
-      BLOG_BUCKET: R2Bucket
+      POSTS_BUCKET: R2Bucket
     }
   }
 }

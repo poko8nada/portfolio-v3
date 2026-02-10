@@ -40,7 +40,7 @@ export default createRoute(c => {
   }
   return c.render(
     <div class='prose'>
-      <PostComponent bucket={c.env.BLOG_BUCKET} slug={slug} />
+      <PostComponent bucket={c.env.POSTS_BUCKET} slug={slug} />
     </div>,
   )
 })

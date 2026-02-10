@@ -11,7 +11,7 @@ export default createRoute(async c => {
 
   if (!path) return c.notFound()
 
-  const bucket = c.env.BLOG_BUCKET
+  const bucket = c.env.POSTS_BUCKET
 
   const result = await getAsset(bucket, path)
 

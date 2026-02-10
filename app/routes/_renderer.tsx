@@ -5,7 +5,7 @@ import { Header } from '../components/header'
 
 export default jsxRenderer(({ children }) => {
   return (
-    <html lang='ja'>
+    <html lang='ja' class='scroll-smooth scroll-pt-36'>
       <head>
         <meta charset='utf-8' />
         <meta name='viewport' content='width=device-width, initial-scale=1.0' />

@@ -157,7 +157,7 @@ app/
 │   ├── _store/              # Route-specific Zustand stores
 │   │   └── dashboardStore.ts
 │   └── _config/             # Route-specific config
-├── blog/
+├── posts/
 │   ├── [slug]/              # Dynamic route
 │   ├── page.tsx
 │   ├── loading.tsx

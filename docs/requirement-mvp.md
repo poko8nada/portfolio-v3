@@ -60,34 +60,46 @@
 
 **FR-01: `app/routes/_renderer.tsx`**
 
-- **要件**: 全ページ共通のHTML骨格、フォント/スタイル読み込み、ヘッダー/フッター固定レイアウト
+- **要件**: 全ページ共通のHTML骨格、フォント/スタイル読み込み、ヘッダー/フッター共通レイアウト
 - **詳細**:
   - `<title>`/`<meta>` はページ側で定義し、HonoXタグホイスティングを利用
-  - ヘッダーは上部固定、フッターは下部固定
-  - hover/animation/icon は使わない
+  - ヘッダーは上部固定、フッターはレイアウト末尾（固定ではない）
+  - リンク/ボタンは軽い色変化の hover と transition を使用
 - **関数/コンポーネント**: `jsxRenderer({ children }): JSX.Element`
 - **テスト観点**: 主要ルートの表示が崩れないこと
 
+**FR-01a: `app/routes/_404.tsx`**
+
+- **要件**: 404時に "404 Not Found" を返す
+- **関数**: `handler(c): Response`
+- **テスト観点**: 404ステータスの設定
+
+**FR-01b: `app/routes/_error.tsx`**
+
+- **要件**: 500時に "Internal Server Error" を返す（Hono標準例外は passthrough）
+- **関数**: `handler(e, c): Response`
+- **テスト観点**: 500ステータスの設定
+
 **FR-02: `app/routes/index.tsx`**
 
-- **要件**: Homeページ（about/blog/tools概要）を表示
+- **要件**: Homeページ（about/posts/tools概要）を表示
 - **詳細**:
-  - blogはR2から取得した一覧の抜粋を表示
-  - toolsは外部リンクのみ
-  - contactはXリンクのみ
-  - モバイルはテキストリンク一覧のレイアウト
+  - About: テキスト + GitHub/X の外部リンクボタン
+  - Posts: R2から取得した一覧の抜粋（最大3件）
+  - Tools: 固定の外部リンク一覧
+  - 詳細ルートは `/posts/:slug`）
+  - タグボタンは `/posts/?tag=...` へのリンクを生成（一覧ルート未実装）
 - **Props**: なし
 - **テスト観点**: R2一覧取得失敗時のエラー表示
 
 ### 3.2. ブログ
 
-**FR-03: `app/routes/posts/index.tsx`**
+**FR-03: `app/routes/posts/index.tsx`（未実装）**
 
 - **要件**: ブログ一覧ページを表示
 - **詳細**:
-  - R2から記事一覧を取得
-  - タグは固定リストと照合して表示
-  - 追加のR2アクセスを抑えるため一覧取得は1回
+  - 現状は未実装。Homeページ内の簡易一覧のみ存在
+  - 一覧取得は `getAllPosts` を使用する想定
 - **Props**: なし
 - **テスト観点**: R2失敗時のエラー表示
 
@@ -96,7 +108,8 @@
 - **要件**: ブログ詳細ページを表示
 - **詳細**:
   - R2から記事本文を取得しMarkdownをHTMLへ変換
-  - frontmatterの title/tags を反映
+  - frontmatterの title を反映
+  - HTMLは `dangerouslySetInnerHTML` で出力
 - **関数/コンポーネント**: `PostComponent({ bucket, slug }): JSX.Element`
 - **テスト観点**: 取得失敗/パース失敗時のエラー表示
 
@@ -104,36 +117,35 @@
 
 - **要件**: R2から記事/アセット取得の共通処理
 - **詳細**:
-  - listPosts/getPost/getAsset を提供
+  - listPosts/getPost/getAllPosts/getAsset を提供
   - 失敗時は Result エラー
-- **関数**: `listPosts(bucket)`, `getPost(bucket, slug)`, `getAsset(bucket, path)`
-- **テスト観点**: 正常/異常の戻り値
+- **関数**: `listPosts(bucket)`, `getPost(bucket, slug)`, `getAllPosts(bucket, limit)`, `getAsset(bucket, path)`
+- **テスト観点**: 正常/異常の戻り値（`app/lib/r2.test.ts`）
 
 **FR-06: `app/lib/markdown.ts`**
 
 - **要件**: Markdown本文のHTML化とfrontmatter抽出
 - **詳細**:
-  - title/tags/content を返す
-- **関数**: `parseMarkdown(content)`
-- **テスト観点**: frontmatter未定義時の挙動
+  - `parseMarkdown` はHTMLとfrontmatterを返却
+  - `parseMetadata` はfrontmatterのみ返却
+- **関数**: `parseMarkdown(content)`, `parseMetadata(content)`
+- **テスト観点**: frontmatter未定義時の挙動（`app/lib/markdown.test.ts`）
 
 ### 3.3. タグフィルタ
 
-**FR-07: `app/config/tags.ts`**
+**FR-07: `app/config/tags.ts`（未実装）**
 
 - **要件**: タグ固定リストをローカル定義
 - **詳細**:
-  - 投稿作成時にこのリストから選択する前提
+  - 現状は未実装
 - **戻り値**: `string[]`
 - **テスト観点**: 不要
 
-**FR-08: `app/islands/tag-filter.tsx`**
+**FR-08: `app/islands/tag-filter.tsx`（未実装）**
 
 - **要件**: クライアント側で一覧をタグフィルタ
 - **詳細**:
-  - 初期タグはURLクエリ（HonoX標準）から取得して反映
-  - 一覧表示の絞り込みはクライアントのみ（追加R2アクセスなし）
-  - nuqsは使用しない
+  - 現状は未実装
 - **Props**: `{ tags: string[], posts: PostSummary[], initialTag?: string }`
 - **テスト観点**: フィルタ状態の切替、URLクエリ反映
 
@@ -177,8 +189,8 @@
 
 **NFR-06: アーキテクチャ**
 
-- HonoXのIslands設計に準拠
-- サーバーレンダリングを基本、クライアントはタグフィルタのみ
+- HonoXのサーバーレンダリングを基本
+- 現状Islandsは未使用（タグフィルタは未実装）
 
 **NFR-07: ライセンスコンプライアンス**
 
@@ -188,13 +200,17 @@
 
 ## 5. ディレクトリ構成と作成ファイル (Directory Structure & Files)
 
-### 5.1. フェーズ1: MVP実装時のディレクトリ構成
+### 5.1. 現状のディレクトリ構成（MVP）
 
 ```
 app/
 ├── client.ts
 ├── server.ts
+├── global.d.ts
+├── style.css
 ├── routes/
+│   ├── _404.tsx
+│   ├── _error.tsx
 │   ├── _renderer.tsx
 │   ├── index.tsx
 │   ├── posts/
@@ -204,14 +220,20 @@ app/
 │       └── images/[path].ts
 ├── islands/
 │   └── tag-filter.tsx
-├── components/
-│   ├── header.tsx
-│   └── footer.tsx
 ├── config/
 │   └── tags.ts
+├── components/
+│   ├── button.tsx
+│   ├── footer.tsx
+│   ├── header.tsx
+│   ├── list-content.tsx
+│   ├── section.tsx
+│   └── text-link.tsx
 ├── lib/
+│   ├── markdown.ts
+│   ├── markdown.test.ts
 │   ├── r2.ts
-│   └── markdown.ts
+│   └── r2.test.ts
 ├── utils/
 │   └── types.ts
 public/
@@ -232,15 +254,16 @@ public/
 
 ### 7.1. 画面一覧 (Screen List)
 
-| No  | 画面名     | URLパス        | 機能概要                | 備考 |
-| --- | ---------- | -------------- | ----------------------- | ---- |
-| 001 | ホーム     | `/`            | About/Blog/Tools概要    |      |
-| 002 | ブログ一覧 | `/posts`       | 記事一覧 + タグフィルタ |      |
-| 003 | ブログ詳細 | `/posts/:slug` | 記事本文表示            |      |
+| No  | 画面名     | URLパス        | 機能概要                | 備考   |
+| --- | ---------- | -------------- | ----------------------- | ------ |
+| 001 | ホーム     | `/`            | About/Posts/Tools概要   |        |
+| 002 | ブログ詳細 | `/posts/:slug` | 記事本文表示            |        |
+| 003 | ブログ一覧 | `/posts`       | 記事一覧 + タグフィルタ | 未実装 |
 
 ### 7.2. 画面フロー図 (Screen Flow Diagram)
 
-- `/` → `/posts` → `/posts/:slug`
+- `/` → `/posts/:slug`（現状）
+- `/` → `/posts` → `/posts/:slug`（予定）
 
 ### 7.3. ワイヤーフレーム・モックアップ (Wireframes & Mockups)
 
@@ -292,7 +315,8 @@ _セマンティックカラー_
 **実装パターン**
 
 - Tailwind v4 のテーマ変数を利用
-- Hover/Animation/Icon は使用しない
+- Hoverは軽微な色変化のみ（transitionは使用）
+- Animation/Icon は使用しない
 
 ---
 

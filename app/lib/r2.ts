@@ -1,4 +1,4 @@
-import { err, ok, type Result } from '../utils/types'
+import { err, isOk, ok, type Result } from '../utils/types'
 
 export async function getPost(
   bucket: R2Bucket,
@@ -29,6 +29,33 @@ export async function listPosts(
       })
 
     return ok(slugs)
+  } catch (e) {
+    return err(e instanceof Error ? e.message : 'Unknown error')
+  }
+}
+
+export async function getAllPosts(
+  bucket: R2Bucket,
+  limit = 100,
+): Promise<Result<{ slug: string; content: string }[], string>> {
+  try {
+    const listResult = await listPosts(bucket)
+    if (isOk(listResult)) {
+      const slugs = listResult.value.slice(0, limit)
+      const posts: { slug: string; content: string }[] = []
+
+      for (const slug of slugs) {
+        const postResult = await getPost(bucket, slug)
+        if (isOk(postResult)) {
+          posts.push({ slug, content: postResult.value })
+        } else {
+          console.warn(`Failed to get post ${slug}: ${postResult.error}`)
+        }
+      }
+
+      return ok(posts)
+    }
+    return err(listResult.error)
   } catch (e) {
     return err(e instanceof Error ? e.message : 'Unknown error')
   }

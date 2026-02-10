@@ -18,18 +18,18 @@ This wire is just atomospheric, color scheme can be changed.
 
 ## pages
 
-- home(has about, blog and tools overview)
+- home(has about, posts and tools overview)
   - header fixed on top and it has navigation links ( doesn't dicide mobile version yet )
   - footer fixed on bottom
 - about unique page is not decided yet
-- blog is list of blog posts, each post has unique page
+- posts is list of posts posts, each post has unique page
 - tools doesn't have unique page, just links from home
 
 ## additional features
 
-- blog posts can be tagged, and tags can be filtered
+- posts posts can be tagged, and tags can be filtered
 - contact form is not needed now, link to X is enough, MVP at least.
-- admin page for adding blog posts, it will be created in future
+- admin page for adding posts posts, it will be created in future
 - need to connect github, deploy automatically on push to main branch
 
 ## need to decide
@@ -38,7 +38,7 @@ This wire is just atomospheric, color scheme can be changed.
 - color scheme
 - layout details, especially mobile version
 - about page content and design
-- blog post page design
+- post page design
 
 ## others
 

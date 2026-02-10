@@ -19,7 +19,7 @@ const createMockBucket = (overrides: Partial<R2Bucket> = {}): R2Bucket => {
 // Create test app with the route handler
 // createRoute returns an array of handlers, so we spread it
 const createTestApp = () => {
-  const app = new Hono<{ Bindings: { BLOG_BUCKET: R2Bucket } }>()
+  const app = new Hono<{ Bindings: { POSTS_BUCKET: R2Bucket } }>()
   app.all('/api/*', ...route)
   return app
 }
@@ -41,7 +41,7 @@ describe('API [...path] route', () => {
       const res = await app.request(
         '/api/images/test.png',
         {},
-        { BLOG_BUCKET: mockBucket },
+        { POSTS_BUCKET: mockBucket },
       )
 
       expect(res.status).toBe(200)
@@ -66,7 +66,7 @@ describe('API [...path] route', () => {
       const res = await app.request(
         '/api/docs/file.pdf',
         {},
-        { BLOG_BUCKET: mockBucket },
+        { POSTS_BUCKET: mockBucket },
       )
 
       expect(res.status).toBe(200)
@@ -89,7 +89,7 @@ describe('API [...path] route', () => {
       const res = await app.request(
         '/api/deep/nested/path/file.txt',
         {},
-        { BLOG_BUCKET: mockBucket },
+        { POSTS_BUCKET: mockBucket },
       )
 
       expect(res.status).toBe(200)
@@ -107,7 +107,7 @@ describe('API [...path] route', () => {
       const res = await app.request(
         '/api/images/missing.png',
         {},
-        { BLOG_BUCKET: mockBucket },
+        { POSTS_BUCKET: mockBucket },
       )
 
       expect(res.status).toBe(404)
@@ -122,7 +122,7 @@ describe('API [...path] route', () => {
       const res = await app.request(
         '/api/images/error.png',
         {},
-        { BLOG_BUCKET: mockBucket },
+        { POSTS_BUCKET: mockBucket },
       )
 
       expect(res.status).toBe(404)

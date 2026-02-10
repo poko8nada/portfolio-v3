@@ -5,7 +5,7 @@ import remarkRehype from 'remark-rehype'
 import { unified } from 'unified'
 import { err, ok, type Result } from '../utils/types'
 
-type PostData = {
+type MetaDate = {
   title: string
   createdAt: string
   updatedAt?: string
@@ -13,6 +13,9 @@ type PostData = {
   tags?: string[]
   version?: number
   [key: string]: any
+}
+
+type PostData = MetaDate & {
   content: string
 }
 
@@ -48,6 +51,33 @@ export async function parseMarkdown(
     }
 
     return ok(postData)
+  } catch (e) {
+    return err(e instanceof Error ? e.message : 'Unknown error')
+  }
+}
+
+export async function parseMetadata(
+  rawContent: string,
+): Promise<Result<MetaDate, string>> {
+  try {
+    if (!rawContent || rawContent.trim() === '') {
+      return err('Empty markdown content')
+    }
+
+    const file = matter(rawContent)
+    const data = file.data as Record<string, any>
+
+    const metadata: MetaDate = {
+      title: data.title ?? 'Untitled',
+      createdAt: data.createdAt ?? new Date().toISOString(),
+      updatedAt: data.updatedAt ?? new Date().toISOString(),
+      isPublished: data.isPublished ?? false,
+      tags: data.tags ?? [],
+      version: data.version ?? 1,
+      ...data,
+    }
+
+    return ok(metadata)
   } catch (e) {
     return err(e instanceof Error ? e.message : 'Unknown error')
   }

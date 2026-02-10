@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "honox-sample-blog",
+  "name": "portfolio-v3",
   "main": "./dist/index.js",
   "compatibility_date": "2026-02-02",
   "compatibility_flags": [
@@ -20,7 +20,7 @@
   // ],
   "r2_buckets": [
     {
-      "binding": "BLOG_BUCKET",
+      "binding": "POSTS_BUCKET",
       "bucket_name": "portfolio-bucket"
     }
   ],

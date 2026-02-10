@@ -32,27 +32,40 @@
 ### Task 1.5: 共通コンポーネント作成
 
 - [x] `app/components/text-link.tsx` - 再利用可能なテキストリンクコンポーネント
+- [x] `app/components/section.tsx` - セクションラッパーコンポーネント（必要に応じて）
+- [x] `app/components/button.tsx` - 再利用可能なボタンコンポーネント（必要に応じて）
+- [x] `app/components/list-content.tsx` - コンテンツリスト表示コンポーネント（必要に応じて）
 
 **依存関係**: Task 1
 **成果物**: 共通パーツの整備
-**完了条件**: `TextLink` が定義され、他コンポーネントで使用可能
+**完了条件**: 他コンポーネントで使用可能
 **テスト**: 不要
 
-## Phase 2: Home/Blog
+## Phase 2: Home/Posts
 
 ### Task 2: Homeページ
 
-- [ ] `app/routes/index.tsx` - About/Blog/Tools概要 **(FR-02)**
+- [x] `app/routes/index.tsx` - About/Posts/Tools概要 **(FR-02)**
 
 **依存関係**: Task 1
 **成果物**: Home画面
 **完了条件**: 各セクションが表示される
 **テスト**: 手動確認
 
+### Task 2.1: Postsリンク整合（未対応）
+
+- [ ] `app/routes/index.tsx` - タグリンク(`/posts?tag=...`)と一覧ルートの整合
+
+**依存関係**: Task 2
+**成果物**: Homeからの導線が正しいURLに統一
+**完了条件**: Posts詳細/一覧の遷移が正しく動作
+**テスト**: 手動確認
+
 ### Task 3: ブログ一覧
 
 - [ ] `app/routes/posts/index.tsx` - 一覧表示 **(FR-03)**
-- [ ] `app/lib/r2.ts` - R2取得の調整 **(FR-05)**
+- [x] `app/lib/r2.ts` - R2取得の調整 **(FR-05)**
+- [ ] `app/lib/r2.test.ts` - R2ユーティリティのテスト更新 **(FR-05)**
 
 **依存関係**: Task 2
 **成果物**: ブログ一覧ページ
@@ -61,8 +74,9 @@
 
 ### Task 4: ブログ詳細
 
-- [ ] `app/routes/posts/[slug].tsx` - 詳細表示 **(FR-04)**
-- [ ] `app/lib/markdown.ts` - Markdown変換 **(FR-06)**
+- [x] `app/routes/posts/[slug].tsx` - 詳細表示 **(FR-04)**
+- [x] `app/lib/markdown.ts` - Markdown変換 **(FR-06)**
+- [ ] `app/lib/markdown.test.ts` - Markdownユーティリティのテスト更新 **(FR-06)**
 
 **依存関係**: Task 3
 **成果物**: ブログ詳細ページ
@@ -94,7 +108,7 @@
 
 ### Task 7: 画像API
 
-- [ ] `app/routes/api/images/[path].ts` - R2画像配信 **(FR-09)**
+- [x] `app/routes/api/images/[path].ts` - R2画像配信 **(FR-09)**
 
 **依存関係**: Task 0
 **成果物**: 画像API
@@ -160,8 +174,8 @@
 ### 機能確認
 
 - [ ] Home 動作確認
-- [ ] Blog一覧 動作確認
-- [ ] Blog詳細 動作確認
+- [ ] post一覧 動作確認
+- [ ] post詳細 動作確認
 - [ ] タグフィルタ動作確認
 - [ ] エラーハンドリング動作確認
 
