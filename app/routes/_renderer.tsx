@@ -1,5 +1,7 @@
 import { jsxRenderer } from 'hono/jsx-renderer'
 import { Link, Script } from 'honox/server'
+import { Footer } from '../components/footer'
+import { Header } from '../components/header'
 
 export default jsxRenderer(({ children }) => {
   return (
@@ -11,14 +13,12 @@ export default jsxRenderer(({ children }) => {
         <Link href='/app/style.css' rel='stylesheet' />
         <Script src='/app/client.ts' async />
       </head>
-      <body class='prose'>
-        <header>
-          <h1>Honox Sample Blog</h1>
-        </header>
-        {children}
-        <footer>
-          <p>&copy; 2024 Honox Sample Blog</p>
-        </footer>
+      <body>
+        <div class='max-w-2xl mx-auto px-4 min-h-screen flex flex-col'>
+          <Header />
+          <main class='grow'>{children}</main>
+          <Footer />
+        </div>
       </body>
     </html>
   )

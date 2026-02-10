@@ -4,12 +4,12 @@
 
 ### Task 0: 依存関係のセットアップ
 
-- [ ] 追加パッケージなし（現状の依存関係を維持）
-- [ ] `package.json` のスクリプト確認
+- [x] 追加パッケージなし（現状の依存関係を維持）
+- [x] `package.json` のスクリプト確認
   - `dev`, `build`, `preview`, `deploy`, `test`, `lint`
-- [ ] 開発環境の動作確認
+- [x] 開発環境の動作確認
   - `pnpm dev` でエラーが出ないことを確認
-- [ ] 不要なファイル・コードの削除
+- [x] 不要なファイル・コードの削除
   - なし
 
 **依存関係**: なし
@@ -19,15 +19,24 @@
 
 ### Task 1: グローバルレイアウト
 
-- [ ] `app/routes/_renderer.tsx` - HTML骨格/ヘッダー/フッター固定 **(FR-01)**
-- [ ] `app/components/header.tsx` - ナビゲーション/ロゴ
-- [ ] `app/components/footer.tsx` - 固定フッター
-- [ ] `app/style.css` - ベーススタイル/フォント/カラー
+- [x] `app/routes/_renderer.tsx` - HTML骨格/ヘッダー/フッター固定 **(FR-01)**
+- [x] `app/components/header.tsx` - ナビゲーション/ロゴ
+- [x] `app/components/footer.tsx` - 固定フッター
+- [x] `app/style.css` - ベーススタイル/フォント/カラー
 
 **依存関係**: Task 0
 **成果物**: 共通レイアウトの完成
 **完了条件**: 主要ページでヘッダー/フッターが固定表示
 **テスト**: 手動確認
+
+### Task 1.5: 共通コンポーネント作成
+
+- [x] `app/components/text-link.tsx` - 再利用可能なテキストリンクコンポーネント
+
+**依存関係**: Task 1
+**成果物**: 共通パーツの整備
+**完了条件**: `TextLink` が定義され、他コンポーネントで使用可能
+**テスト**: 不要
 
 ## Phase 2: Home/Blog
 
