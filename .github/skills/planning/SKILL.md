@@ -23,7 +23,7 @@ Never skip MVP phase. Build incrementally, validate early.
 
 Use templates in `docs/template/`:
 
-- `docs/template/requirement.template.md` - For feature specifications
+- `docs/template/requirement-mvp.template.md` - For feature specifications
 - `docs/template/tasks_mvp.template.md` - For MVP task breakdown
 
 ### Document Placement
@@ -45,8 +45,8 @@ docs/
 
 Regarding template items:
 
-- Do not make assumptions or delete items without permission.
-- If anything is unclear, always ask the user and have discussion.
+- Do **NOT** make assumptions or delete items without permission.
+- If anything is unclear, always **ASK** the user and have discussion.
 
 ## Technology Stack
 
