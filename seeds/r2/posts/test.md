@@ -4,6 +4,10 @@ createdAt: 2026-03-20
 updatedAt: 2026-03-20
 version: 1
 isPublished: true
+tags:
+  - test
+  - r2
+  - image
 ---
 
 # Asset Delivery Test

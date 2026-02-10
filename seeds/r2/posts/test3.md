@@ -1,14 +1,15 @@
 ---
-title: Image Delivery Test2
-createdAt: 2026-03-21
-updatedAt: 2026-03-21
+title: Image Delivery Test3
+createdAt: 2026-03-30
+updatedAt: 2026-03-30
 version: 1
 isPublished: true
 tags:
-  - book
+  - test
+  - diary
 ---
 
-# Asset Delivery Test2
+# Asset Delivery Test3
 
 This is a test post to verify that images are correctly delivered from R2 via the API endpoint.
 
