@@ -16,18 +16,13 @@ export async function getPost(
 
 export async function listPosts(
   bucket: R2Bucket,
+  limit = 100,
 ): Promise<Result<string[], string>> {
   try {
-    const list = await bucket.list({ prefix: 'posts/' })
-    const slugs = list.objects
-      .filter(obj => obj.key?.endsWith('.md'))
-      .map(obj => {
-        const key = obj.key as string
-        // Strip the "posts/" prefix and the ".md" suffix to produce the slug.
-        // e.g. "posts/my-post.md" -> "my-post"
-        return key.slice('posts/'.length, -'.md'.length)
-      })
-
+    const list = await bucket.list({ prefix: 'posts/', limit })
+    const slugs = list.objects.map(obj =>
+      obj.key.replace('posts/', '').replace('.md', ''),
+    )
     return ok(slugs)
   } catch (e) {
     return err(e instanceof Error ? e.message : 'Unknown error')
@@ -39,12 +34,10 @@ export async function getAllPosts(
   limit = 100,
 ): Promise<Result<{ slug: string; content: string }[], string>> {
   try {
-    const listResult = await listPosts(bucket)
+    const listResult = await listPosts(bucket, limit)
     if (isOk(listResult)) {
-      const slugs = listResult.value.slice(0, limit)
       const posts: { slug: string; content: string }[] = []
-
-      for (const slug of slugs) {
+      for (const slug of listResult.value) {
         const postResult = await getPost(bucket, slug)
         if (isOk(postResult)) {
           posts.push({ slug, content: postResult.value })
@@ -52,7 +45,6 @@ export async function getAllPosts(
           console.warn(`Failed to get post ${slug}: ${postResult.error}`)
         }
       }
-
       return ok(posts)
     }
     return err(listResult.error)

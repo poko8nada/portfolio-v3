@@ -3,52 +3,7 @@ import { Button } from '../components/button'
 import { ListContent } from '../components/list-content'
 import { Section } from '../components/section'
 import { TextLink } from '../components/text-link'
-import { parseMetadata } from '../lib/markdown'
-import { getAllPosts } from '../lib/r2'
-import { isErr } from '../utils/types'
-
-const PostListComponent = async ({ bucket }: { bucket: R2Bucket }) => {
-  const postsResult = await getAllPosts(bucket, 3)
-  if (isErr(postsResult)) {
-    return <div>Error loading posts: {postsResult.error}</div>
-  }
-
-  const posts = postsResult.value
-  const metadataList = []
-  for (const post of posts) {
-    const metaResult = await parseMetadata(post.content)
-    if (isErr(metaResult)) {
-      console.warn(
-        `Failed to parse metadata for post ${post.slug}: ${metaResult.error}`,
-      )
-      continue
-    }
-    metadataList.push({ slug: post.slug, ...metaResult.value })
-  }
-
-  return (
-    <ul class='list-none px-0'>
-      {metadataList.map(meta => (
-        <ListContent
-          key={meta.slug}
-          href={`/posts/${meta.slug}`}
-          title={meta.title}
-        >
-          <div class='mt-2 text-sm text-text-secondary'>
-            {new Date(meta.createdAt).toLocaleDateString('ja-JP', {})}
-          </div>
-          <div class='mt-1'>
-            {meta.tags?.map(tag => (
-              <Button size='sm' href={`/posts?tag=${tag}`}>
-                {tag}
-              </Button>
-            ))}
-          </div>
-        </ListContent>
-      ))}
-    </ul>
-  )
-}
+import { PostList } from '../features/post-list'
 
 const PROJECTS = [
   {
@@ -79,7 +34,7 @@ const PROJECTS = [
 
 export default createRoute(c => {
   return c.render(
-    <div class='pt-36'>
+    <div>
       <title>Poko Hanada</title>
       <Section heading='About' id='about' class='prose'>
         <div class='mb-10'>
@@ -110,7 +65,7 @@ export default createRoute(c => {
         </div>
       </Section>
       <Section heading='Posts' id='posts'>
-        <PostListComponent bucket={c.env.POSTS_BUCKET} />
+        <PostList bucket={c.env.POSTS_BUCKET} displayCount={3} />
         <div class='mt-10'>
           <TextLink href='/posts'>すべての記事 →</TextLink>
         </div>

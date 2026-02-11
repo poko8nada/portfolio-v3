@@ -16,7 +16,7 @@ export default jsxRenderer(({ children }) => {
       <body>
         <div class='max-w-2xl mx-auto px-4 min-h-screen flex flex-col'>
           <Header />
-          <main class='grow'>{children}</main>
+          <main class='grow mt-36'>{children}</main>
           <Footer />
         </div>
       </body>
