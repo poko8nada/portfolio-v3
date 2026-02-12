@@ -6,7 +6,7 @@ version: 1
 isPublished: true
 tags:
   - program
-  - Next.js
+  - Nextjs
   - markdown
 ---
 

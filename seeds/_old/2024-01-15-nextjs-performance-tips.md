@@ -5,7 +5,7 @@ updatedAt: 2024-01-15
 version: 1
 isPublished: true
 tags:
-  - Next.js
+  - Nextjs
   - program
   - design
 ---
