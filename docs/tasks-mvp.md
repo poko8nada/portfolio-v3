@@ -68,7 +68,7 @@
 - [x] `app/routes/posts/index.tsx` - 一覧表示 **(FR-03)**
 - [x] `app/features/post-list.tsx` - 一覧取得/タグ・タイトルフィルタ/表示 **(FR-03a)**
 - [x] `app/lib/r2.ts` - R2取得の調整 **(FR-05)**
-- [ ] `app/lib/r2.test.ts` - R2ユーティリティのテスト更新 **(FR-05)**
+- [x] `app/lib/r2.test.ts` - R2ユーティリティのテスト更新 **(FR-05)**
 
 **依存関係**: Task 2
 **成果物**: ブログ一覧ページ
@@ -80,7 +80,7 @@
 - [x] `app/routes/posts/[slug].tsx` - 詳細表示 + Recent Posts表示 **(FR-04)**
 - [x] `app/components/post-content.tsx` - 記事本文表示コンポーネント **(FR-06a)**
 - [x] `app/lib/markdown.ts` - Markdown変換 + PostData型エクスポート **(FR-06)**
-- [ ] `app/lib/markdown.test.ts` - Markdownユーティリティのテスト更新 **(FR-06)**
+- [x] `app/lib/markdown.test.ts` - Markdownユーティリティのテスト更新 **(FR-06)**
 
 **依存関係**: Task 3
 **成果物**: ブログ詳細ページ + Recent Postsセクション
