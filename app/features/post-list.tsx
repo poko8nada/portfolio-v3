@@ -9,11 +9,13 @@ export const PostList = async ({
   displayCount,
   tag,
   cacheOptions,
+  title,
 }: {
   bucket: R2Bucket
   displayCount?: number
   tag?: string | null
   cacheOptions?: CacheOptions
+  title?: string
 }) => {
   const postsResult = await getAllPosts(bucket, 100, cacheOptions)
   if (isErr(postsResult)) {
@@ -46,6 +48,7 @@ export const PostList = async ({
     <ul class='list-none px-0'>
       {sortedMetadataList
         .filter(meta => (tag ? meta.tags?.includes(tag) : true))
+        .filter(meta => (title ? !meta.title.includes(title) : true))
         .map(meta => (
           <ListContent
             key={meta.slug}

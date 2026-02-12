@@ -15,7 +15,7 @@ type MetaDate = {
   [key: string]: any
 }
 
-type PostData = MetaDate & {
+export type PostData = MetaDate & {
   content: string
 }
 

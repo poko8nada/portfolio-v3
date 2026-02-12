@@ -114,8 +114,9 @@
   - `updatedAt`/`createdAt` の降順で並べ替え
   - `displayCount` があれば件数を制限
   - `tag` 指定時は該当タグのみ表示
+  - `title` 指定時は該当タイトルを除外表示（記事詳細ページで同記事を重複表示しないため）
   - タグボタンは `/posts?tag=...` へ遷移
-- **Props**: `{ bucket: R2Bucket, displayCount?: number, tag?: string | null }`
+- **Props**: `{ bucket: R2Bucket, displayCount?: number, tag?: string | null, cacheOptions?: CacheOptions, title?: string }`
 - **テスト観点**: 手動確認
 
 **FR-04: `app/routes/posts/[slug].tsx`**
@@ -124,9 +125,11 @@
 - **詳細**:
   - R2から記事本文を取得しMarkdownをHTMLへ変換
   - frontmatterの title を反映
-  - HTMLは `dangerouslySetInnerHTML` で出力
-- **関数/コンポーネント**: `PostComponent({ bucket, slug }): JSX.Element`
-- **テスト観点**: 取得失敗/パース失敗時のエラー表示
+  - `isPublished: false` の記事は表示しない
+  - 記事詳細ページ下部に「Recent Posts」セクション（同記事を除く3件）を表示
+  - HTMLは `PostContent` コンポーネントで出力
+- **関数/コンポーネント**: `createRoute(async c): Response`
+- **テスト観点**: 取得失敗/パース失敗時/非公開記事のエラー表示
 
 **FR-05: `app/lib/r2.ts`**
 
@@ -143,8 +146,20 @@
 - **詳細**:
   - `parseMarkdown` はHTMLとfrontmatterを返却
   - `parseMetadata` はfrontmatterのみ返却
+  - `PostData` 型を外部エクスポート（他モジュールから型参照可能）
 - **関数**: `parseMarkdown(content)`, `parseMetadata(content)`
+- **型**: `export type PostData`
 - **テスト観点**: frontmatter未定義時の挙動（`app/lib/markdown.test.ts`）
+
+**FR-06a: `app/components/post-content.tsx`**
+
+- **要件**: ブログ記事本文を表示するコンポーネント
+- **詳細**:
+  - `PostData` を受け取り、タイトルと本文を表示
+  - HTMLは `dangerouslySetInnerHTML` で出力
+  - キャッシュ状態は `fromCache` で判定（X-Cache ヘッダー参照）
+- **Props**: `{ postData: PostData }`
+- **テスト観点**: 手動確認
 
 ### 3.3. タグフィルタ
 

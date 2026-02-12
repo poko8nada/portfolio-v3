@@ -64,24 +64,25 @@
 ### Task 3: ブログ一覧
 
 - [x] `app/routes/posts/index.tsx` - 一覧表示 **(FR-03)**
-- [x] `app/features/post-list.tsx` - 一覧取得/フィルタ/表示 **(FR-03a)**
+- [x] `app/features/post-list.tsx` - 一覧取得/タグ・タイトルフィルタ/表示 **(FR-03a)**
 - [x] `app/lib/r2.ts` - R2取得の調整 **(FR-05)**
 - [ ] `app/lib/r2.test.ts` - R2ユーティリティのテスト更新 **(FR-05)**
 
 **依存関係**: Task 2
 **成果物**: ブログ一覧ページ
-**完了条件**: R2から一覧が表示される
+**完了条件**: R2から一覧が表示される、タイトルフィルタで記事除外が動作
 **テスト**: 既存テスト + 手動確認
 
 ### Task 4: ブログ詳細
 
-- [x] `app/routes/posts/[slug].tsx` - 詳細表示 **(FR-04)**
-- [x] `app/lib/markdown.ts` - Markdown変換 **(FR-06)**
+- [x] `app/routes/posts/[slug].tsx` - 詳細表示 + Recent Posts表示 **(FR-04)**
+- [x] `app/components/post-content.tsx` - 記事本文表示コンポーネント **(FR-06a)**
+- [x] `app/lib/markdown.ts` - Markdown変換 + PostData型エクスポート **(FR-06)**
 - [ ] `app/lib/markdown.test.ts` - Markdownユーティリティのテスト更新 **(FR-06)**
 
 **依存関係**: Task 3
-**成果物**: ブログ詳細ページ
-**完了条件**: slugで本文が表示される
+**成果物**: ブログ詳細ページ + Recent Postsセクション
+**完了条件**: slugで本文が表示される、下部にRecent Postsが表示される、非公開記事は表示されない
 **テスト**: 既存テスト + 手動確認
 
 ## Phase 3: タグフィルタ
