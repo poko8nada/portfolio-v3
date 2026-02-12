@@ -65,7 +65,11 @@ export default createRoute(c => {
         </div>
       </Section>
       <Section heading='Posts' id='posts'>
-        <PostList bucket={c.env.POSTS_BUCKET} displayCount={3} />
+        <PostList
+          bucket={c.env.POSTS_BUCKET}
+          displayCount={3}
+          cacheOptions={{ ctx: c.executionCtx, request: c.req.raw }}
+        />
         <div class='mt-10'>
           <TextLink href='/posts'>すべての記事 →</TextLink>
         </div>

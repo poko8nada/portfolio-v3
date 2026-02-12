@@ -14,9 +14,9 @@ export default defineConfig({
     build()
   ],
   ssr: {
-    external: [
-      'debug',
-      'extend'
-      ],
-    },
+    external: ['debug', 'extend'],
+    resolve: {
+      conditions: ['workerd', 'worker', 'module', 'node', 'development|production']
+    }
+  }
 })

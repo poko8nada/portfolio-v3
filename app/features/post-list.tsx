@@ -1,19 +1,21 @@
 import { Button } from '../components/button'
 import { ListContent } from '../components/list-content'
 import { parseMetadata } from '../lib/markdown'
-import { getAllPosts } from '../lib/r2'
+import { type CacheOptions, getAllPosts } from '../lib/r2'
 import { isErr } from '../utils/types'
 
 export const PostList = async ({
   bucket,
   displayCount,
   tag,
+  cacheOptions,
 }: {
   bucket: R2Bucket
   displayCount?: number
   tag?: string | null
+  cacheOptions?: CacheOptions
 }) => {
-  const postsResult = await getAllPosts(bucket)
+  const postsResult = await getAllPosts(bucket, 100, cacheOptions)
   if (isErr(postsResult)) {
     return <div>Error loading posts: {postsResult.error}</div>
   }

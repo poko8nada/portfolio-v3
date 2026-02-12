@@ -40,7 +40,8 @@
   - `format`: なし
   - `typecheck`: なし
   - `db:migrate`: なし
-  - `db:seed`: seed:r2
+  - `seed:r2`: node seeds/r2.mjs
+  - `seed:reset`: rm -rf .wrangler/state && npm run seed:r2
   - `generate`: なし
 - **その他**: gray-matter-es, unified/remark/rehype
 
@@ -85,23 +86,37 @@
 - **要件**: Homeページ（about/posts/tools概要）を表示
 - **詳細**:
   - About: テキスト + GitHub/X の外部リンクボタン
-  - Posts: R2から取得した一覧の抜粋（最大3件）
+  - Posts: `PostList` でR2から取得した一覧の抜粋（最大3件）
+  - 一覧導線は `/posts` へのリンクを設置
   - Tools: 固定の外部リンク一覧
-  - 詳細ルートは `/posts/:slug`）
-  - タグボタンは `/posts/?tag=...` へのリンクを生成（一覧ルート未実装）
+  - 詳細ルートは `/posts/:slug`
+  - タグボタンは `/posts?tag=...` へのリンクを生成
 - **Props**: なし
 - **テスト観点**: R2一覧取得失敗時のエラー表示
 
 ### 3.2. ブログ
 
-**FR-03: `app/routes/posts/index.tsx`（未実装）**
+**FR-03: `app/routes/posts/index.tsx`**
 
 - **要件**: ブログ一覧ページを表示
 - **詳細**:
-  - 現状は未実装。Homeページ内の簡易一覧のみ存在
-  - 一覧取得は `getAllPosts` を使用する想定
+  - `tag` クエリを取得して `TagFilter` と `PostList` に渡す
+  - `PostList` が一覧とタグボタンを生成
+  - `tag` 未指定時は全件表示
 - **Props**: なし
 - **テスト観点**: R2失敗時のエラー表示
+
+**FR-03a: `app/features/post-list.tsx`**
+
+- **要件**: 記事メタデータの一覧表示コンポーネント
+- **詳細**:
+  - `getAllPosts` で記事を取得し `parseMetadata` で解析
+  - `updatedAt`/`createdAt` の降順で並べ替え
+  - `displayCount` があれば件数を制限
+  - `tag` 指定時は該当タグのみ表示
+  - タグボタンは `/posts?tag=...` へ遷移
+- **Props**: `{ bucket: R2Bucket, displayCount?: number, tag?: string | null }`
+- **テスト観点**: 手動確認
 
 **FR-04: `app/routes/posts/[slug].tsx`**
 
@@ -141,13 +156,14 @@
 - **戻り値**: `string[]`
 - **テスト観点**: 不要
 
-**FR-08: `app/islands/tag-filter.tsx`（未実装）**
+**FR-08: `app/islands/tag-filter.tsx`**
 
-- **要件**: クライアント側で一覧をタグフィルタ
+- **要件**: 選択中タグの表示と解除
 - **詳細**:
-  - 現状は未実装
-- **Props**: `{ tags: string[], posts: PostSummary[], initialTag?: string }`
-- **テスト観点**: フィルタ状態の切替、URLクエリ反映
+  - `tag` がある場合のみ表示する
+  - 解除ボタンで `/posts` に遷移しフィルタを解除
+- **Props**: `{ tag: string | null }`
+- **テスト観点**: 解除操作でクエリが外れること
 
 ### 3.4. 画像配信
 
@@ -159,6 +175,17 @@
 - **関数**: `getAsset(bucket, path)`
 - **テスト観点**: 404/500のハンドリング
 
+**FR-10: キャッシュロジック (Cache API)**
+
+- **要件**: R2からの取得結果を Cloudflare Cache API でキャッシュする
+- **詳細**:
+  - `getPost` および `getAsset` 時に `caches.default` を使用してレスポンスをキャッシュ
+  - キャッシュキーは実際のリクエストホスト名と正規化されたパス（`/__r2_cache__/`）を組み合わせて生成
+  - `ctx.waitUntil` を使用し、レスポンスを返した後に非同期でキャッシュを更新
+  - 開発/検証用に `X-Cache: HIT/MISS` ヘッダーを付与
+- **関数**: `app/lib/r2.ts` 内の各関数を拡張
+- **テスト観点**: `caches.default` の呼び出しおよび `X-Cache` ヘッダーの検証（`app/lib/r2.test.ts`）
+
 ---
 
 ## 4. 非機能要件 (Non-Functional Requirements)
@@ -167,6 +194,7 @@
 
 - 静的に近い体験を維持し、Islandsを最小限にする
 - 追加R2アクセスを避け、一覧取得は1回
+- Cache API を活用し、R2へのリクエスト回数を最小化（10倍程度の高速化を目標）
 
 **NFR-02: 互換性**
 
@@ -190,7 +218,7 @@
 **NFR-06: アーキテクチャ**
 
 - HonoXのサーバーレンダリングを基本
-- 現状Islandsは未使用（タグフィルタは未実装）
+- Islandsは `tag-filter` のみ利用（フィルタ解除UI）
 
 **NFR-07: ライセンスコンプライアンス**
 
@@ -220,8 +248,8 @@ app/
 │       └── images/[path].ts
 ├── islands/
 │   └── tag-filter.tsx
-├── config/
-│   └── tags.ts
+├── features/
+│   └── post-list.tsx
 ├── components/
 │   ├── button.tsx
 │   ├── footer.tsx
@@ -254,16 +282,17 @@ public/
 
 ### 7.1. 画面一覧 (Screen List)
 
-| No  | 画面名     | URLパス        | 機能概要                | 備考   |
-| --- | ---------- | -------------- | ----------------------- | ------ |
-| 001 | ホーム     | `/`            | About/Posts/Tools概要   |        |
-| 002 | ブログ詳細 | `/posts/:slug` | 記事本文表示            |        |
-| 003 | ブログ一覧 | `/posts`       | 記事一覧 + タグフィルタ | 未実装 |
+| No  | 画面名     | URLパス        | 機能概要                | 備考 |
+| --- | ---------- | -------------- | ----------------------- | ---- |
+| 001 | ホーム     | `/`            | About/Posts/Tools概要   |      |
+| 002 | ブログ詳細 | `/posts/:slug` | 記事本文表示            |      |
+| 003 | ブログ一覧 | `/posts`       | 記事一覧 + タグフィルタ |      |
 
 ### 7.2. 画面フロー図 (Screen Flow Diagram)
 
-- `/` → `/posts/:slug`（現状）
-- `/` → `/posts` → `/posts/:slug`（予定）
+- `/` → `/posts/:slug`
+- `/` → `/posts` → `/posts/:slug`
+- `/` → `/posts?tag=...` → `/posts/:slug`
 
 ### 7.3. ワイヤーフレーム・モックアップ (Wireframes & Mockups)
 

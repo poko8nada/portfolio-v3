@@ -4,6 +4,7 @@ import { isErr } from '../../../utils/types'
 
 export default createRoute(async c => {
   let path = c.req.path
+  // console.log(`[Image API] Requested path: ${path}`)
   const prefix = '/api/'
   if (path.startsWith(prefix)) {
     path = path.slice(prefix.length)
@@ -13,21 +14,33 @@ export default createRoute(async c => {
 
   const bucket = c.env.POSTS_BUCKET
 
-  const result = await getAsset(bucket, path)
+  // console.log(`[Image API] Calling getAsset with path: ${path}`)
+  // Fetch asset using the enhanced getAsset with Cache API support
+  const result = await getAsset(bucket, path, {
+    ctx: c.executionCtx,
+    request: c.req.raw,
+  })
 
-  if (isErr(result)) return c.notFound()
-
-  const object = result.value
-
-  // Set appropriate headers
-  if (object.httpMetadata?.contentType) {
-    c.header('Content-Type', object.httpMetadata.contentType)
+  if (isErr(result)) {
+    console.warn(`[Image API] Asset not found or error: ${path}`, result.error)
+    return c.notFound()
   }
-  if (object.httpEtag) {
-    c.header('ETag', object.httpEtag)
+
+  const { body, httpMetadata, httpEtag, fromCache } = result.value
+
+  // Set X-Cache header to indicate cache status
+  c.header('X-Cache', fromCache ? 'HIT' : 'MISS')
+
+  // Set appropriate headers for the response
+  if (httpMetadata?.contentType) {
+    c.header('Content-Type', httpMetadata.contentType)
   }
-  // Cache for 7 days
+  if (httpEtag) {
+    c.header('ETag', httpEtag)
+  }
+
+  // Browser/CDN cache control (stays in browser for 7 days)
   c.header('Cache-Control', 'public, max-age=604800')
 
-  return c.body(object.body)
+  return c.body(body)
 })

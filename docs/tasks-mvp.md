@@ -52,9 +52,9 @@
 **完了条件**: 各セクションが表示される
 **テスト**: 手動確認
 
-### Task 2.1: Postsリンク整合（未対応）
+### Task 2.1: Postsリンク整合
 
-- [ ] `app/routes/index.tsx` - タグリンク(`/posts?tag=...`)と一覧ルートの整合
+- [x] `app/routes/index.tsx` - タグリンク(`/posts?tag=...`)と一覧ルート(`/posts`)の整合
 
 **依存関係**: Task 2
 **成果物**: Homeからの導線が正しいURLに統一
@@ -63,7 +63,8 @@
 
 ### Task 3: ブログ一覧
 
-- [ ] `app/routes/posts/index.tsx` - 一覧表示 **(FR-03)**
+- [x] `app/routes/posts/index.tsx` - 一覧表示 **(FR-03)**
+- [x] `app/features/post-list.tsx` - 一覧取得/フィルタ/表示 **(FR-03a)**
 - [x] `app/lib/r2.ts` - R2取得の調整 **(FR-05)**
 - [ ] `app/lib/r2.test.ts` - R2ユーティリティのテスト更新 **(FR-05)**
 
@@ -94,14 +95,14 @@
 **完了条件**: 一覧が参照可能
 **テスト**: 不要
 
-### Task 6: タグフィルタ（クライアント）
+### Task 6: タグフィルタ（UI）
 
-- [ ] `app/islands/tag-filter.tsx` - クライアント側フィルタ **(FR-08)**
-- [ ] `app/routes/posts/index.tsx` - initialTagをURLクエリから設定
+- [x] `app/islands/tag-filter.tsx` - 選択中タグの表示/解除 **(FR-08)**
+- [x] `app/routes/posts/index.tsx` - tagをURLクエリから設定
 
-**依存関係**: Task 5
+**依存関係**: Task 3
 **成果物**: タグフィルタUI
-**完了条件**: フィルタが動作、URLクエリ反映
+**完了条件**: 選択中タグが表示され、解除で `/posts` に戻る
 **テスト**: 手動確認
 
 ## Phase 4: 画像配信
@@ -114,6 +115,20 @@
 **成果物**: 画像API
 **完了条件**: 画像が取得できる
 **テスト**: 既存テスト
+
+## Phase 4.5: キャッシュ最適化
+
+### Task 7.5: Cache API 実装
+
+- [x] `app/lib/r2.ts` - Cache API ロジックの追加 **(FR-10)**
+- [x] `app/lib/r2.test.ts` - キャッシュロジックのテストコード追加
+- [x] `app/routes/posts/[slug].tsx` - ExecutionContext の受け渡し対応
+- [x] `app/routes/api/images/[path].ts` - ExecutionContext の受け渡しと X-Cache ヘッダー追加
+
+**依存関係**: Task 3, Task 7
+**成果物**: キャッシュ対応済みR2クライアント
+**完了条件**: 重複リクエスト時にキャッシュが利用され、`X-Cache: HIT` が返ること
+**テスト**: `app/lib/r2.test.ts` (Vitest)
 
 ---
 
