@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { isOk } from '../utils/types'
-import { getAsset, getPost, listPosts } from './r2'
+import { isErr, isOk } from '../utils/types'
+import { getAllPosts, getAsset, getPost, listPosts } from './r2'
 
 // R2Bucket のシンプルなモックを作成
 const createMockBucket = (overrides: Partial<R2Bucket> = {}): R2Bucket => {
@@ -101,6 +101,22 @@ describe('r2 client utility with cache', () => {
         expect(result.value.fromCache).toBe(false)
       }
     })
+
+    it('should return error when post is not found in R2', async () => {
+      mockCache.match.mockResolvedValue(null)
+      const mockBucket = createMockBucket({
+        get: vi.fn().mockResolvedValue(null),
+      })
+
+      const result = await getPost(mockBucket, 'missing', {
+        request: mockRequest,
+      })
+
+      expect(isErr(result)).toBe(true)
+      if (isErr(result)) {
+        expect(result.error).toBe('Post not found: missing')
+      }
+    })
   })
 
   describe('getAsset', () => {
@@ -152,6 +168,22 @@ describe('r2 client utility with cache', () => {
       expect(mockBucket.get).toHaveBeenCalledWith('images/test.jpg')
       expect(mockCtx.waitUntil).toHaveBeenCalled()
     })
+
+    it('should return error when asset is not found in R2', async () => {
+      mockCache.match.mockResolvedValue(null)
+      const mockBucket = createMockBucket({
+        get: vi.fn().mockResolvedValue(null),
+      })
+
+      const result = await getAsset(mockBucket, 'images/missing.png', {
+        request: mockRequest,
+      })
+
+      expect(isErr(result)).toBe(true)
+      if (isErr(result)) {
+        expect(result.error).toBe('Asset not found: images/missing.png')
+      }
+    })
   })
 
   describe('listPosts', () => {
@@ -171,6 +203,43 @@ describe('r2 client utility with cache', () => {
       expect(isOk(result)).toBe(true)
       if (isOk(result)) {
         expect(result.value).toEqual(['post-1', 'post-2'])
+      }
+    })
+
+    it('should return error when bucket.list throws', async () => {
+      const mockBucket = createMockBucket({
+        list: vi.fn().mockRejectedValue(new Error('list failed')),
+      })
+
+      const result = await listPosts(mockBucket)
+
+      expect(isErr(result)).toBe(true)
+      if (isErr(result)) {
+        expect(result.error).toBe('list failed')
+      }
+    })
+  })
+
+  describe('getAllPosts', () => {
+    it('should return only successfully fetched posts', async () => {
+      mockCache.match.mockResolvedValue(null)
+      const mockBucket = createMockBucket({
+        list: vi.fn().mockResolvedValue({
+          objects: [{ key: 'posts/post-1.md' }, { key: 'posts/post-2.md' }],
+        }),
+        get: vi
+          .fn()
+          .mockResolvedValueOnce({
+            text: () => Promise.resolve('# Post 1'),
+          })
+          .mockResolvedValueOnce(null),
+      })
+
+      const result = await getAllPosts(mockBucket, 100, { request: mockRequest })
+
+      expect(isOk(result)).toBe(true)
+      if (isOk(result)) {
+        expect(result.value).toEqual([{ slug: 'post-1', content: '# Post 1' }])
       }
     })
   })

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { isErr, isOk } from '../utils/types'
-import { parseMarkdown } from './markdown'
+import { parseMarkdown, parseMetadata } from './markdown'
 
 describe('markdown processor utility', () => {
   it('should parse markdown with full frontmatter correctly', async () => {
@@ -70,6 +70,49 @@ This is a test post.`
     expect(isErr(result)).toBe(true)
     if (isErr(result)) {
       expect(result.error).toBeDefined()
+    }
+  })
+})
+
+describe('metadata parser utility', () => {
+  it('should parse frontmatter metadata only', async () => {
+    const rawContent = `---
+title: Meta Post
+createdAt: 2024-03-01T00:00:00Z
+isPublished: true
+tags: [meta, test]
+customField: keep-me
+---
+# Body`
+
+    const result = await parseMetadata(rawContent)
+
+    expect(isOk(result)).toBe(true)
+    if (isOk(result)) {
+      expect(result.value.title).toBe('Meta Post')
+      expect(result.value.isPublished).toBe(true)
+      expect(result.value.tags).toEqual(['meta', 'test'])
+      expect(result.value.customField).toBe('keep-me')
+    }
+  })
+
+  it('should use defaults when frontmatter is missing', async () => {
+    const result = await parseMetadata('# No frontmatter')
+
+    expect(isOk(result)).toBe(true)
+    if (isOk(result)) {
+      expect(result.value.title).toBe('Untitled')
+      expect(result.value.isPublished).toBe(false)
+      expect(result.value.tags).toEqual([])
+    }
+  })
+
+  it('should return error for empty metadata input', async () => {
+    const result = await parseMetadata('   ')
+
+    expect(isErr(result)).toBe(true)
+    if (isErr(result)) {
+      expect(result.error).toBe('Empty markdown content')
     }
   })
 })

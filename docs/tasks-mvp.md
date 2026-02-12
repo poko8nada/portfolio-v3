@@ -1,5 +1,7 @@
 # MVP実装タスク (tasks-mvp.md)
 
+> 注記: 現状コードを正として同期。`app/lib/r2.test.ts` / `app/lib/markdown.test.ts` の仕様追従更新は未完了タスクとして維持。
+
 ## Phase 1: 基盤/レイアウト
 
 ### Task 0: 依存関係のセットアップ
@@ -102,6 +104,7 @@
 ### Task 6: 画像API
 
 - [x] `app/routes/api/images/[path].ts` - R2画像配信 **(FR-09)**
+- [x] `app/routes/api/images/[path].test.ts` - 画像APIのキャッシュ/404挙動テスト
 
 **依存関係**: Task 0
 **成果物**: 画像API
@@ -117,7 +120,7 @@
 - [x] `app/routes/posts/[slug].tsx` - ExecutionContext の受け渡し対応
 - [x] `app/routes/api/images/[path].ts` - ExecutionContext の受け渡しと X-Cache ヘッダー追加
 
-**依存関係**: Task 3, Task 7
+**依存関係**: Task 3, Task 6
 **成果物**: キャッシュ対応済みR2クライアント
 **完了条件**: 重複リクエスト時にキャッシュが利用され、`X-Cache: HIT` が返ること
 **テスト**: `app/lib/r2.test.ts` (Vitest)
@@ -196,5 +199,3 @@
 
 - [ ] README.md 更新完了
 - [ ] CHANGELOG.md 作成完了
-- [ ] ライセンス情報記載完了
-- [ ] デプロイ手順ドキュメント作成完了

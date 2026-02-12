@@ -13,13 +13,15 @@ export const Header: FC = () => {
               class='w-full h-full object-cover'
             />
           </div>
-          <a
-            href='/'
-            class='text-text-primary text-lg xs:text-2xl tracking-tighter mr-2'
-          >
-            Poko <br class='xs:hidden' />
-            Hanada
-          </a>
+          <h1>
+            <a
+              href='/'
+              class='text-text-primary text-lg xs:text-2xl tracking-tighter mr-2'
+            >
+              Poko <br class='xs:hidden' />
+              Hanada
+            </a>
+          </h1>
         </div>
         <nav>
           <ul class='flex gap-2 xs:gap-6 space-x-1'>

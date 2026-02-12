@@ -11,6 +11,13 @@ export default jsxRenderer(({ children }) => {
         <meta name='viewport' content='width=device-width, initial-scale=1.0' />
         {/* favicon.ico does not work well with some browsers */}
         <link rel='icon' href='/favicon.png' type='image/png' />
+        {/* OGP Meta Tags */}
+        <meta property='og:image' content='/ogp.png' />
+        <meta property='og:image:width' content='1200' />
+        <meta property='og:image:height' content='630' />
+        <meta property='og:type' content='website' />
+        <meta name='twitter:card' content='summary_large_image' />
+        <meta name='twitter:image' content='/ogp.png' />
         <Link href='/app/style.css' rel='stylesheet' />
         <Script src='/app/client.ts' async />
       </head>

@@ -7,12 +7,6 @@ import { PostList } from '../features/post-list'
 
 const PROJECTS = [
   {
-    href: 'https://slide-generator.you-88451-h.workers.dev',
-    title: 'Slide Generator',
-    description:
-      'Markdownをリアルタイムでスライドに変換。エディタ・スライドビューア・PDF出力を備えたサービス。',
-  },
-  {
     href: 'https://link-card-generator-v2.vercel.app',
     title: 'Blog Card Maker',
     description:

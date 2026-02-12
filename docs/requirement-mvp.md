@@ -112,8 +112,8 @@
 - **詳細**:
   - `getAllPosts` で記事を取得し `parseMetadata` で解析
   - `updatedAt`/`createdAt` の降順で並べ替え
-  - `displayCount` があれば件数を制限
-  - `tag` 指定時は該当タグのみ表示
+  - `displayCount` があれば件数を制限（絞り込み前に適用）
+  - `tag` 指定時は該当タグのみ表示（`displayCount` 適用後）
   - `title` 指定時は該当タイトルを除外表示（記事詳細ページで同記事を重複表示しないため）
   - タグボタンは `/posts?tag=...` へ遷移
 - **Props**: `{ bucket: R2Bucket, displayCount?: number, tag?: string | null, cacheOptions?: CacheOptions, title?: string }`
@@ -157,7 +157,7 @@
 - **詳細**:
   - `PostData` を受け取り、タイトルと本文を表示
   - HTMLは `dangerouslySetInnerHTML` で出力
-  - キャッシュ状態は `fromCache` で判定（X-Cache ヘッダー参照）
+  - `isPublished` が `false` の場合は本文を表示しない
 - **Props**: `{ postData: PostData }`
 - **テスト観点**: 手動確認
 
@@ -179,8 +179,9 @@
 - **要件**: R2から画像を取得して配信
 - **詳細**:
   - 該当パスがない場合は404
+  - `X-Cache: HIT/MISS` と `Cache-Control` を付与
 - **関数**: `getAsset(bucket, path)`
-- **テスト観点**: 404/500のハンドリング
+- **テスト観点**: 404ハンドリング・ヘッダー付与（`app/routes/api/images/[path].test.ts`）
 
 **FR-10: キャッシュロジック (Cache API)**
 
@@ -252,7 +253,9 @@ app/
 │   │   ├── index.tsx
 │   │   └── [slug].tsx
 │   └── api/
-│       └── images/[path].ts
+│       └── images/
+│           ├── [path].ts
+│           └── [path].test.ts
 ├── islands/
 │   └── tag-filter.tsx
 ├── features/
@@ -305,7 +308,7 @@ public/
 
 - `docs/drafts/portfolio-v3-wire.png`
 
-**Note**: It is enough to providee low-fidelity wireframes or figma links.
+**Note**: It is enough to provide low-fidelity wireframes or figma links.
 
 ---
 
@@ -322,12 +325,10 @@ public/
 _プライマリカラー_
 
 - Primary: `#E5E7EB` - テキスト主
-- Primary hover: `#E5E7EB` - hoverは使用しない
 
 _セカンダリカラー_
 
 - Secondary: `#A1A1AA` - サブテキスト
-- Secondary hover: `#A1A1AA` - hoverは使用しない
 
 _背景・テキストカラー_
 
