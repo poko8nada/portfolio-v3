@@ -4,6 +4,7 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
+  --breakpoint-xs: 30.5rem;
   --color-background: #0a0a0a;
   --color-surface: #111827;
   --color-text-primary: #e5e7eb;

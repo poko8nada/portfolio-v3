@@ -147,11 +147,13 @@
 - [ ] デプロイ設定
   - 環境変数設定（必要に応じて）
   - ビルド設定確認
-- [ ] OGP 画像作成・配置
-  - `og.png` (1200x630px)
-- [ ] Favicon 準備・追加
-  - `favicon.ico`
-- [ ] メタデータ設定完了（title, description, OGP）
+- [x] OGP 画像作成・配置 (`ogp.png`)
+- [x] Favicon 準備・追加 (`favicon.ico`)
+- [x] メタデータ実装 (title, description, OGP)
+  - [x] `app/routes/_renderer.tsx`: 共通のOGP/Twitterタグ設定
+  - [x] `app/routes/index.tsx`: Home個別のメタ情報
+  - [x] `app/routes/posts/index.tsx`: 一覧ページのメタ情報
+  - [x] `app/routes/posts/[slug].tsx`: 記事ごとの動的なメタ情報
 - [ ] 本番環境での動作確認
   - 全機能の動作確認
   - レスポンシブ表示確認
@@ -173,9 +175,8 @@
 
 ### リソース・メタデータ
 
-- [ ] OGP画像・Favicon設置完了
-- [ ] ライセンスクレジット表示確認（該当する場合）
-- [ ] メタデータ設定完了（title, description, OGP）
+- [x] OGP画像・Favicon設置完了
+- [x] メタデータ設定完了（title, description, OGP）
 
 ### 機能確認
 

@@ -33,9 +33,19 @@ const PROJECTS = [
 ]
 
 export default createRoute(c => {
+  const title = 'Poko Hanada'
+  const description =
+    'Webディレクター兼デベロッパー、Poko Hanadaのポートフォリオサイトです。'
+
   return c.render(
     <div>
-      <title>Poko Hanada</title>
+      <title>{title}</title>
+      <meta name='description' content={description} />
+      <meta property='og:title' content={title} />
+      <meta property='og:description' content={description} />
+      <meta name='twitter:title' content={title} />
+      <meta name='twitter:description' content={description} />
+
       <Section heading='About' id='about' class='prose'>
         <div class='mb-10'>
           <p>こんにちは。PokoHanadaです。</p>

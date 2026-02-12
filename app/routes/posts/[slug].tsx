@@ -19,7 +19,12 @@ export default createRoute(async c => {
   })
 
   if (isErr(getResult)) {
-    return c.render(<div>Error: {getResult.error}</div>)
+    return c.render(
+      <div>
+        <title>Error | Poko Hanada</title>
+        Error: {getResult.error}
+      </div>,
+    )
   }
 
   const { content, fromCache } = getResult.value
@@ -28,16 +33,40 @@ export default createRoute(async c => {
 
   const parseResult = await parseMarkdown(content)
   if (isErr(parseResult)) {
-    return c.render(<div>Error: {parseResult.error}</div>)
+    return c.render(
+      <div>
+        <title>Error | Poko Hanada</title>
+        Error: {parseResult.error}
+      </div>,
+    )
   }
 
   const postData = parseResult.value
 
   if (!postData.isPublished) {
-    return c.render(<div>This post is not published.</div>)
+    return c.render(
+      <div>
+        <title>Not Published | Poko Hanada</title>
+        This post is not published.
+      </div>,
+    )
   }
+
+  const title = `${postData.title} | Poko Hanada`
+  const description =
+    postData.description ||
+    postData.content.replace(/<[^>]*>?/gm, '').substring(0, 160)
+
   return c.render(
-    <>
+    <div>
+      <title>{title}</title>
+      <meta name='description' content={description} />
+      <meta property='og:title' content={title} />
+      <meta property='og:description' content={description} />
+      <meta property='og:type' content='article' />
+      <meta name='twitter:title' content={title} />
+      <meta name='twitter:description' content={description} />
+
       <section class='prose'>
         <PostContent postData={postData} />
       </section>
@@ -45,6 +74,6 @@ export default createRoute(async c => {
       <Section heading='Recent Posts'>
         <PostList bucket={bucket} displayCount={3} title={postData.title} />
       </Section>
-    </>,
+    </div>,
   )
 })
