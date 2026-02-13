@@ -17,6 +17,10 @@ export type AssetResult = {
   fromCache: boolean
 }
 
+const R2_CACHE_NAME = 'r2-cache'
+const POST_CACHE_CONTROL = 'public, s-maxage=3600'
+const ASSET_CACHE_CONTROL = 'public, s-maxage=604800'
+
 /**
  * Generate a consistent cache key for R2 objects.
  * Uses the request hostname and a dedicated path prefix to avoid collisions.
@@ -27,27 +31,43 @@ function getCacheKey(request: Request, path: string): Request {
   return new Request(cacheUrl.toString())
 }
 
+async function matchCache(
+  cache: Cache,
+  cacheKey: Request | null,
+): Promise<Response | null> {
+  if (!cacheKey) return null
+  try {
+    return (await cache.match(cacheKey)) ?? null
+  } catch (e) {
+    console.warn('Cache match failed:', e)
+    return null
+  }
+}
+
+function persistCache(
+  cache: Cache,
+  cacheKey: Request | null,
+  ctx: ExecutionContext | undefined,
+  response: Response,
+) {
+  if (!cacheKey || !ctx) return
+  ctx.waitUntil(cache.put(cacheKey, response.clone()))
+}
+
 export async function getPost(
   bucket: R2Bucket,
   slug: string,
   options?: CacheOptions,
 ): Promise<Result<PostResult, string>> {
   const key = `posts/${slug}.md`
-  const cache = await caches.open('r2-cache')
+  const cache = await caches.open(R2_CACHE_NAME)
   const cacheKey = options?.request ? getCacheKey(options.request, key) : null
 
-  if (cacheKey) {
-    try {
-      const cachedResponse = await cache.match(cacheKey)
-      if (cachedResponse) {
-        // console.log(`[Cache HIT] post: ${slug}`)
-        const content = await cachedResponse.text()
-        return ok({ content, fromCache: true })
-      }
-    } catch (e) {
-      // Log error but fallback to R2
-      console.warn('Cache match failed:', e)
-    }
+  const cachedResponse = await matchCache(cache, cacheKey)
+  if (cachedResponse) {
+    // console.log(`[Cache HIT] post: ${slug}`)
+    const content = await cachedResponse.text()
+    return ok({ content, fromCache: true })
   }
 
   try {
@@ -60,10 +80,10 @@ export async function getPost(
       const response = new Response(content, {
         headers: {
           'Content-Type': 'text/markdown; charset=utf-8',
-          'Cache-Control': 'public, s-maxage=3600',
+          'Cache-Control': POST_CACHE_CONTROL,
         },
       })
-      options.ctx.waitUntil(cache.put(cacheKey, response))
+      persistCache(cache, cacheKey, options.ctx, response)
     }
 
     return ok({ content, fromCache: false })
@@ -117,29 +137,20 @@ export async function getAsset(
   path: string,
   options?: CacheOptions,
 ): Promise<Result<AssetResult, string>> {
-  const cache = await caches.open('r2-cache')
+  const cache = await caches.open(R2_CACHE_NAME)
   const cacheKey = options?.request ? getCacheKey(options.request, path) : null
 
-  if (cacheKey) {
-    try {
-      const cachedResponse = await cache.match(cacheKey)
-      if (cachedResponse) {
-        // console.log(`[Cache HIT] path: ${path}`)
-        if (cachedResponse.body) {
-          return ok({
-            body: cachedResponse.body,
-            httpMetadata: {
-              contentType:
-                cachedResponse.headers.get('Content-Type') || undefined,
-            },
-            httpEtag: cachedResponse.headers.get('ETag') || undefined,
-            fromCache: true,
-          })
-        }
-      }
-    } catch (e) {
-      console.warn('Cache match failed:', e)
-    }
+  const cachedResponse = await matchCache(cache, cacheKey)
+  if (cachedResponse?.body) {
+    // console.log(`[Cache HIT] path: ${path}`)
+    return ok({
+      body: cachedResponse.body,
+      httpMetadata: {
+        contentType: cachedResponse.headers.get('Content-Type') || undefined,
+      },
+      httpEtag: cachedResponse.headers.get('ETag') || undefined,
+      fromCache: true,
+    })
   }
 
   try {
@@ -159,10 +170,10 @@ export async function getAsset(
       }
       if (object.httpEtag) headers.set('ETag', object.httpEtag)
       // Cache for 7 days in edge cache
-      headers.set('Cache-Control', 'public, s-maxage=604800')
+      headers.set('Cache-Control', ASSET_CACHE_CONTROL)
 
       const response = new Response(body, { headers })
-      options.ctx.waitUntil(cache.put(cacheKey, response.clone()))
+      persistCache(cache, cacheKey, options.ctx, response)
       if (response.body) {
         body = response.body
       }

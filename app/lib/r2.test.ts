@@ -235,7 +235,9 @@ describe('r2 client utility with cache', () => {
           .mockResolvedValueOnce(null),
       })
 
-      const result = await getAllPosts(mockBucket, 100, { request: mockRequest })
+      const result = await getAllPosts(mockBucket, 100, {
+        request: mockRequest,
+      })
 
       expect(isOk(result)).toBe(true)
       if (isOk(result)) {

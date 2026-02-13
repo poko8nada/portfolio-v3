@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      extend:
-        specifier: ^3.0.2
-        version: 3.0.2
       gray-matter-es:
         specifier: ^0.2.1
         version: 0.2.1

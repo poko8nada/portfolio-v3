@@ -37,8 +37,8 @@
   - `deploy`: pnpm run build && wrangler deploy
   - `test`: vitest
   - `lint`: biome check --write
-  - `format`: なし
-  - `typecheck`: なし
+  - `format`: biome format --write .
+  - `typecheck`: pnpm exec tsc --noEmit
   - `db:migrate`: なし
   - `seed:r2`: node seeds/r2.mjs
   - `seed:reset`: rm -rf .wrangler/state && npm run seed:r2

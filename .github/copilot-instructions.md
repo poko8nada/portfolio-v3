@@ -28,6 +28,12 @@
 | `playwright-mcp`      | Browser automation, web interaction, Playwright MCP                 |
 | `ui-design`           | UI/UX design, styling, accessibility                                |
 
+### Proactive Use of Skills
+
+Knowledge-intensive tasks → Thoroughly review `SKILL.md` before starting work and precisely apply the documented procedures/constraints.
+
+Before execution, clearly state in one line the reason for using the skill.
+
 ## Task Execution Workflow
 
 **For every request**: Silently evaluate which skill(s) would help most. Load matching SKILL.md file(s) into context if relevant.
@@ -42,7 +48,7 @@
      Investigate and propose fixes → **Get approval** → Implement fixes → Rerun tests → Verify and explain → **Seek further instructions from user** → Return to investigate
 
 4. Update documentation if needed
-5. Lint and format code
+5. Type-check, lint and format code if needed
 6. Prepare commit message → **Get approval** → Commit
 
 ## Trigger Keywords
