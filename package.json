@@ -10,11 +10,14 @@
     "lint": "biome check --write",
     "format": "biome format --write .",
     "typecheck": "pnpm exec tsc --noEmit",
-    "seed:r2": "node seeds/r2.mjs",
-    "seed:reset": "rm -rf .wrangler/state && npm run seed:r2"
+    "seed:r2": "pnpm run seed:r2:local",
+    "seed:r2:local": "node seeds/r2.mjs --local",
+    "seed:r2:prod": "node seeds/r2.mjs --prod",
+    "seed:reset": "rm -rf .wrangler/state && pnpm run seed:r2:local"
   },
   "private": true,
   "dependencies": {
+    "extend": "^3.0.2",
     "gray-matter-es": "^0.2.1",
     "hono": "^4.11.7",
     "honox": "0.1.52",

@@ -16,7 +16,7 @@ const PROJECTS = [
     href: 'https://time-call-web-v1.vercel.app',
     title: 'Time Call Web',
     description:
-      'シンプルで軽量の時報通知アプリ。時報は音声でお知らせ。1分〜60分間隔で設定が可能。',
+      'シンプルな時報通知アプリ。時報は音声でお知らせ。1分〜60分間隔で設定が可能。',
   },
   {
     href: 'https://tiny-calc-894742994238.asia-northeast1.run.app',
@@ -44,7 +44,7 @@ export default createRoute(c => {
         <div class='mb-10'>
           <p>こんにちは。PokoHanadaです。</p>
           <p>
-            Webディレクター兼、デベロッパー。
+            Webディレクター・デベロッパー・エンジニア。
             <br />
             企画・設計から実装・運用まで一貫して担当いたします。
           </p>

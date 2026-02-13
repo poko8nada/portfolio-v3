@@ -40,8 +40,10 @@
   - `format`: biome format --write .
   - `typecheck`: pnpm exec tsc --noEmit
   - `db:migrate`: なし
-  - `seed:r2`: node seeds/r2.mjs
-  - `seed:reset`: rm -rf .wrangler/state && npm run seed:r2
+  - `seed:r2`: pnpm run seed:r2:local
+  - `seed:r2:local`: node seeds/r2.mjs --local
+  - `seed:r2:prod`: node seeds/r2.mjs --prod
+  - `seed:reset`: rm -rf .wrangler/state && pnpm run seed:r2:local
   - `generate`: なし
 - **その他**: gray-matter-es, unified/remark/rehype
 
@@ -361,7 +363,7 @@ _セマンティックカラー_
 
 ### 9.1. 運用タスク（MVP後・ダッシュボード作業）
 
-- [ ] GA4 / GTM 設定を Cloudflare ダッシュボードで反映
+- [ ] GA4 / GTM 設定
 - [ ] カスタムドメイン設定を Cloudflare ダッシュボードで反映
 
 ### 9.2. 備考
