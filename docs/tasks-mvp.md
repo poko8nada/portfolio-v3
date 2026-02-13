@@ -152,11 +152,11 @@
   - [x] `app/routes/index.tsx`: Home個別のメタ情報
   - [x] `app/routes/posts/index.tsx`: 一覧ページのメタ情報
   - [x] `app/routes/posts/[slug].tsx`: 記事ごとの動的なメタ情報
-- [ ] 本番環境での動作確認
+- [x] 本番環境での動作確認
   - 全機能の動作確認
   - レスポンシブ表示確認
-- [ ] 次段階への移行準備ドキュメント作成
-  - requirement-v3-1.md, tasks-v3-1.md
+- [x] 次段階への移行準備ドキュメント作成
+  - requirement-prod1.md, tasks-prod1.md
 
 **依存関係**: ブラウザ互換性・パフォーマンス確認完了
 **成果物**: デプロイ済み MVP、運用ドキュメント
@@ -164,19 +164,19 @@
 
 ### Task 10: ダッシュボード運用設定（手動）
 
-- [ ] GA4 / GTM 移設（ダッシュボード作業）
-  - [ ] 既存ポートフォリオの GTM コンテナ設定（タグ/トリガー/変数）を棚卸し
-  - [ ] 本ポートフォリオの GTM コンテナへ GA4 設定タグ・イベントタグを移設
-  - [ ] GTM Preview で主要ページ（`/`, `/posts`, `/posts/:slug`）の発火確認
-  - [ ] GA4 Realtime でイベント受信確認後、GTM を Publish
-- [ ] GA4 / GTM 受け口実装（コード作業）
+- [x] GA4 / GTM 移設（ダッシュボード作業）
+  - [x] 既存ポートフォリオの GTM コンテナ設定（タグ/トリガー/変数）を棚卸し
+  - [x] 本ポートフォリオの GTM コンテナへ GA4 設定タグ・イベントタグを移設
+  - [x] GTM Preview で主要ページ（`/`, `/posts`, `/posts/:slug`）の発火確認
+  - [x] GA4 Realtime でイベント受信確認後、GTM を Publish
+- [x] GA4 / GTM 受け口実装（コード作業）
   - [x] GTM スニペット埋め込み位置を `_renderer.tsx` で確認・反映
   - [x] GTM/GA4 で利用する環境変数を `wrangler.jsonc` に定義
-  - [ ] ローカル/Preview で環境変数注入時のタグ出力を確認
-- [ ] カスタムドメイン移設（Cloudflare管理）
-  - [ ] Cloudflare DNS/Workers Routes で既存ドメイン設定を引き継ぎ
-  - [ ] SSL/TLS 証明書状態とリダイレクト設定（www有無）を確認
-  - [ ] 公開URLでルーティング・計測（GA4）・静的アセット配信を確認
+  - [x] ローカル/Preview で環境変数注入時のタグ出力を確認
+- [x] カスタムドメイン移設（Cloudflare管理）
+  - [x] Cloudflare DNS/Workers Routes で既存ドメイン設定を引き継ぎ
+  - [x] SSL/TLS 証明書状態とリダイレクト設定（www有無）を確認
+  - [x] 公開URLでルーティング・計測（GA4）・静的アセット配信を確認
 
 **依存関係**: Task 9
 **成果物**: 運用設定が本番環境へ反映された状態
