@@ -3,7 +3,16 @@ import { Link, Script } from 'honox/server'
 import { Footer } from '../components/footer'
 import { Header } from '../components/header'
 
-export default jsxRenderer(({ children }) => {
+const gtmScript = (containerId: string) =>
+  `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','${containerId}');`
+
+export default jsxRenderer(({ children }, c) => {
+  const gtmContainerId = c.env.GTM_CONTAINER_ID
+
   return (
     <html lang='ja' class='scroll-smooth scroll-pt-36'>
       <head>
@@ -18,10 +27,28 @@ export default jsxRenderer(({ children }) => {
         <meta property='og:type' content='website' />
         <meta name='twitter:card' content='summary_large_image' />
         <meta name='twitter:image' content='/ogp.png' />
+        {gtmContainerId ? (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: gtmScript(gtmContainerId),
+            }}
+          />
+        ) : null}
         <Link href='/app/style.css' rel='stylesheet' />
         <Script src='/app/client.ts' async />
       </head>
       <body>
+        {gtmContainerId ? (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${gtmContainerId}`}
+              height='0'
+              width='0'
+              style='display:none;visibility:hidden'
+              title='gtm'
+            />
+          </noscript>
+        ) : null}
         <div class='max-w-2xl mx-auto px-4 min-h-screen flex flex-col'>
           <Header />
           <main class='grow mt-36'>{children}</main>

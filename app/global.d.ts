@@ -5,6 +5,7 @@ declare module 'hono' {
     Variables: {}
     Bindings: {
       POSTS_BUCKET: R2Bucket
+      GTM_CONTAINER_ID?: string
     }
   }
 }
