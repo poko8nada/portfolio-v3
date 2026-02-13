@@ -5,514 +5,183 @@ description: HonoX architecture guidelines including file-based routing, Islands
 
 # HonoX Architecture Guidelines
 
-Always consult Context7 and official HonoX documentation if you plan to deviate from these guidelines.
+Use this skill as a **project-proven, reusable baseline** for HonoX applications.
+It is derived from a working production setup and intentionally generalized for reuse.
 
-## Version & Stack
+## Version & Stack (Recommended Baseline)
 
-- **HonoX**: 0.1.52+
-- **Renderer**: hono/jsx
-- **Build Tool**: Vite
+- **Hono**: 4.x
+- **HonoX**: 0.1.x
 - **Runtime**: Cloudflare Workers (Wrangler)
-- **CSS Framework**: Tailwind CSS v4
+- **Build**: Vite
+- **CSS**: Tailwind CSS v4 (or project equivalent)
+- **Storage**: Optional object storage (R2-compatible pattern)
 
-## Core Concepts
+## Project Structure (Reusable Shape)
 
-### File-Based Routing
+```txt
+app/
+├─ client.ts
+├─ server.ts
+├─ global.d.ts
+├─ style.css
+├─ components/
+├─ features/
+│  └─ [domain-feature].tsx
+├─ islands/
+│  └─ [interactive-component].tsx
+├─ lib/
+│  ├─ [domain-parser].ts
+│  └─ [storage-adapter].ts
+├─ routes/
+│  ├─ _renderer.tsx
+│  ├─ _404.tsx
+│  ├─ _error.tsx
+│  ├─ index.tsx
+│  ├─ [resource]/
+│  │  ├─ index.tsx
+│  │  └─ [param].tsx
+│  └─ api/
+│     └─ [resource]/
+│        └─ [param].ts
+└─ utils/
+   └─ types.ts
+```
 
-Routes are automatically generated from the `app/routes/` directory structure:
+## File-Based Routing (Pattern)
 
 - `app/routes/index.tsx` → `/`
-- `app/routes/posts/[id].tsx` → `/posts/:id` (dynamic)
-- `app/routes/_renderer.tsx` → Global layout (NOT a route)
-- `app/routes/_404.tsx` → Custom 404 handler
-- `app/routes/_error.tsx` → Custom error handler
+- `app/routes/[resource]/index.tsx` → `/[resource]`
+- `app/routes/[resource]/[param].tsx` → `/[resource]/:param`
+- `app/routes/api/[resource]/[param].ts` → `/api/[resource]/:param`
+- `app/routes/_renderer.tsx` → Global renderer/layout
+- `app/routes/_404.tsx` → Not found handler
+- `app/routes/_error.tsx` → Error handler
 
-### Islands Architecture
-
-Only interactive components require client-side JavaScript:
-
-- **Islands** (`app/islands/` or `$` prefix): Components hydrated on client (use `useState`, event handlers)
-- **Server Components** (pages/layouts): Plain JSX, server-rendered only
-- **Zero JS by Default**: Pages without Islands have zero JavaScript sent to client
-
-## Component Types
-
-### 1. Page/Layout Components (Server)
-
-Render on server only. No client-side interactivity.
-
-```typescript
-import { createRoute } from 'honox/factory'
-
-export default createRoute(c => {
-  const name = c.req.query('name') ?? 'Hono'
-  return c.render(
-    <div>
-      <h1>Hello, {name}!</h1>
-    </div>
-  )
-})
-```
-
-**Benefits:**
-
-- No JavaScript sent to client
-- Can fetch data directly in component
-- Optimal performance for static content
-
-### 2. Island Components (Client)
-
-Use `useState`, event handlers, client-side logic.
-The `$` prefix marks this component as an Island, ensuring it's hydrated on the client.
-
-**In `app/islands/` directory or `$` prefix in routes:**
-
-```typescript
-import { useState } from 'hono/jsx'
-
-export default function Counter() {
-  const [count, setCount] = useState(0)
-  return (
-    <div>
-      <p>{count}</p>
-      <button onClick={() => setCount(count + 1)}>
-        Increment
-      </button>
-    </div>
-  )
-}
-```
-
-### 3. API Routes
-
-Return JSON/data instead of rendering JSX.
-
-```typescript
-// app/routes/api/hello.ts
-import { createRoute } from "honox/factory";
-
-export default createRoute((c) => {
-  return c.json({
-    message: "Hello, HonoX!",
-    timestamp: new Date().toISOString(),
-  });
-});
-```
-
-### 4. Dynamic Routes
-
-Use `[param]` syntax for dynamic segments:
-
-```typescript
-// app/routes/posts/[id].tsx
-import { createRoute } from 'honox/factory'
-import PostLike from './$post-like'
-
-export default createRoute(c => {
-  const id = c.req.param('id')
-  return c.render(
-    <div>
-      <title>Post {id}</title>
-      <h1>Post ID: {id}</h1>
-      <PostLike />
-    </div>
-  )
-})
-```
-
-Access via: `/posts/123`, `/posts/hello`, etc.
-
-## Global Layout (\_renderer.tsx)
-
-Required file that wraps all routes with HTML structure.
-
-```typescript
-import { jsxRenderer } from 'hono/jsx-renderer'
-import { Link, Script } from 'honox/server'
-
-export default jsxRenderer(({ children }) => {
-  return (
-    <html lang='ja'>
-      <head>
-        <meta charset='utf-8' />
-        <meta name='viewport' content='width=device-width, initial-scale=1.0' />
-        <link rel='icon' href='/favicon.ico' />
-        <Link href='/app/style.css' rel='stylesheet' />
-        <Script src='/app/client.ts' async />
-      </head>
-      <body>{children}</body>
-    </html>
-  )
-})
-```
-
-### Script and Link Components
-
-- `<Script>` - Inject client-side JavaScript (only needed if Islands exist)
-- `<Link>` - Vite-aware asset linking (resolves paths from manifest)
-
-These are automatically processed by Vite at build time.
-
-## Tag Hoisting (Meta Tags)
-
-HonoX automatically hoists `<title>` and `<meta>` tags from page components to `<head>`:
-
-```typescript
-export default createRoute(c => {
-  return c.render(
-    <div>
-      <title>My Post Title</title>
-      <meta name='description' content='...' />
-      <h1>Content</h1>
-    </div>
-  )
-})
-```
-
-**Rendered as:**
-
-```html
-<html>
-  <head>
-    <title>My Post Title</title>
-    <meta name="description" content="..." />
-  </head>
-  <body>
-    <div><h1>Content</h1></div>
-  </body>
-</html>
-```
+Use semantic dynamic params (`[slug]`, `[path]`, `[id]`) consistently per domain.
 
 ## Entry Points
 
 ### app/server.ts
 
-Server-side initialization. Must export default Hono app or handler.
-
-```typescript
+```ts
+import { showRoutes } from "hono/dev";
 import { createApp } from "honox/server";
-import routes from "./routes";
 
 const app = createApp();
-app.route("/", routes);
+showRoutes(app);
 
 export default app;
 ```
 
 ### app/client.ts
 
-Client-side hydration. Registers Islands for hydration.
+```ts
+import { createClient } from "honox/client";
 
-```typescript
-import { startClient } from "honox/client";
-
-startClient();
+createClient();
 ```
 
-Automatically discovers and hydrates Island components.
+Prefer `createClient()` for HonoX 0.1.x-style client bootstrap.
 
-## Data Flow Patterns
+## Rendering & Layout Rules
 
-### Pattern 1: Server-Only Page
+Keep `_renderer.tsx` as the single source of shared HTML shell concerns:
 
-No Islands, no client JavaScript:
+- `<Link href='/app/style.css' rel='stylesheet' />`
+- `<Script src='/app/client.ts' async />`
+- Shared layout (`Header`, `Footer`, main container)
+- Common OGP/Twitter defaults
+- Optional analytics initialization via env binding
 
-```
-Page Component (render on server)
-  ↓ (no Islands inside)
-  ↓
-Send HTML (zero JS)
-```
+Define route-level `<title>` and `<meta>` inside page routes and let head aggregation handle output.
 
-### Pattern 2: Page with Islands
+## Islands Rules
 
-Server component contains Island components:
+- Put interactive components in `app/islands/`
+- Import islands from server-rendered routes/components
+- Hydrate only where interaction is required
 
-```
-Page Component (SSR on server)
-  ├─ Static content (h1, p, etc.)
-  └─ Island Component
-       ↓
-       └─ Hydrate on client → Interactive
+```ts
+import InteractiveFilter from "../../islands/interactive-filter";
 ```
 
-### Pattern 3: API + Client Fetch
+### Do
 
-Fetch data from API route on client-side:
+- Keep islands small and focused
+- Keep state local unless cross-island sharing is truly needed
 
-```typescript
-// Page component
-export default createRoute(c => {
-  return c.render(<MyComponent />)
-})
+### Don't
 
-// Island component (client-side fetch)
-function MyComponent() {
-  const [data, setData] = useState(null)
+- Do not island-ize static markup
+- Do not move server-only logic into islands
 
-  useEffect(() => {
-    fetch('/api/data').then(r => r.json()).then(setData)
-  }, [])
+## Data Access Pattern (Storage + Cache API)
 
-  return <div>{JSON.stringify(data)}</div>
+Use one dedicated adapter module (e.g. `app/lib/storage.ts`) for all storage reads/writes:
+
+- `getItem(storage, key, options)`
+- `listItems(storage, options)`
+- `getAsset(storage, path, options)`
+
+Recommended behavior:
+
+- Use Cache API for edge caching (`caches.open(...)`)
+- Use `ExecutionContext` + `ctx.waitUntil` for non-blocking cache writes
+- Use explicit `Result<T, E>`-style returns for recoverable failures
+- Resolve success/error branches at route level
+
+## API Route Pattern
+
+For asset/data proxy routes:
+
+- Normalize/validate route params
+- Fetch through adapter (`getAsset`/`getItem`)
+- Add observability headers like `X-Cache: HIT|MISS`
+- Set `Content-Type` / `ETag` / `Cache-Control` when available
+- Return `c.notFound()` for missing objects
+
+## Error Handling
+
+- `_404.tsx`: `NotFoundHandler`
+- `_error.tsx`: `ErrorHandler`
+  - If error already exposes a response, return it directly
+  - Otherwise return 500 with safe fallback UI
+
+## Env & Types
+
+Define runtime bindings in `app/global.d.ts`:
+
+```ts
+Bindings: {
+  STORAGE_BUCKET: R2Bucket
+  ANALYTICS_ID?: string
 }
 ```
 
-## Performance Best Practices
+Always update type declarations when adding/changing worker bindings.
 
-### 1. Minimize Islands
-
-Only use Islands for truly interactive parts. Static content should be server-rendered.
-
-```typescript
-// ❌ Avoid: Island for static content
-export function StaticText() {
-  const [text] = useState('Hello')
-  return <p>{text}</p>
-}
-
-// ✅ Good: Server component for static content
-export function StaticText() {
-  return <p>Hello</p>
-}
-```
-
-### 2. Zero-JS Pages
-
-For pages without Islands, JavaScript is automatically skipped. Ensure `Script` component is only in `_renderer.tsx`:
-
-```typescript
-// _renderer.tsx
-<Script src='/app/client.ts' async />  // ✅ Only here
-```
-
-If no Islands exist on a page, `client.ts` won't execute for that page.
-
-### 3. Lazy Load Heavy Components
-
-For expensive computations, load only when needed:
-
-```typescript
-// ✅ Good: Lazy load expensive component
-function Page() {
-  const [showAdvanced, setShowAdvanced] = useState(false)
-
-  return (
-    <div>
-      <button onClick={() => setShowAdvanced(!showAdvanced)}>
-        Show Advanced
-      </button>
-      {showAdvanced && <ExpensiveComponent />}
-    </div>
-  )
-}
-```
-
-### 4. Use Vite's Code Splitting
-
-Vite automatically splits code at import boundaries. Keep Islands separate from heavy utilities:
-
-```typescript
-// app/islands/chart.tsx (will be its own chunk)
-import { Chart } from "heavy-chart-lib";
-
-export default function ChartIsland() {
-  // ...
-}
-```
-
-## Common Patterns
-
-### Pattern: Global State (if needed)
-
-Use Context API with Islands:
-
-```typescript
-import { createContext } from 'hono/jsx'
-
-export const GlobalContext = createContext({})
-
-// Provider Island
-export function Provider({ children }) {
-  const [value, setValue] = useState({})
-  return (
-    <GlobalContext.Provider value={value}>
-      {children}
-    </GlobalContext.Provider>
-  )
-}
-
-// Consumer Island
-export function Consumer() {
-  const value = useContext(GlobalContext)
-  // ...
-}
-```
-
-### Pattern: Form Handling
-
-Handle forms on server-side or with client Islands:
-
-```typescript
-// Server-side form handling
-export default createRoute(c => {
-  if (c.req.method === 'POST') {
-    const data = await c.req.formData()
-    // Process form
-    return c.redirect('/success')
-  }
-  return c.render(<form method='post'>...</form>)
-})
-
-// Client-side form with Island
-export function FormIsland() {
-  const [status, setStatus] = useState('')
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    const res = await fetch('/api/submit', { method: 'POST', body: new FormData(e.target) })
-    setStatus(res.ok ? 'Success' : 'Error')
-  }
-
-  return <form onSubmit={handleSubmit}>...</form>
-}
-```
-
-## Common Pitfalls
-
-### ❌ Client Hooks in Server Components
-
-```typescript
-// ❌ WRONG: useState in non-Island component
-export function BadComponent() {
-  const [count, setCount] = useState(0)  // This won't work!
-  return <button onClick={() => setCount(count + 1)}>{count}</button>
-}
-```
-
-**Fix:** Place in `app/islands/` or use `$` prefix in routes.
-
-### ❌ Forgetting $ Prefix for Islands in Routes
-
-```typescript
-// ❌ WRONG: Named like Island but placed in routes/ without $
-// app/routes/button.tsx
-export function InteractiveButton() {
-  const [clicked, setClicked] = useState(0)
-  return <button onClick={() => setClicked(clicked + 1)}>{clicked}</button>
-}
-
-// ✅ CORRECT: Use $ prefix
-// app/routes/$button.tsx
-export default function InteractiveButton() {
-  const [clicked, setClicked] = useState(0)
-  return <button onClick={() => setClicked(clicked + 1)}>{clicked}</button>
-}
-```
-
-### ❌ Mixing Server and Client Logic
-
-```typescript
-// ❌ WRONG: Importing Island in server component causes issues
-import Island from '../islands/heavy-island'
-
-export default createRoute(c => {
-  return c.render(
-    <div>
-      <Island />  // This tries to execute client code on server
-    </div>
-  )
-})
-
-// ✅ CORRECT: Islands are auto-discovered and hydrated
-export default createRoute(c => {
-  return c.render(
-    <div>
-      <MyIsland />  // Import from islands/ or use $ prefix
-    </div>
-  )
-})
-```
-
-## Testing & Development
-
-### HMR (Hot Module Replacement)
-
-Vite provides fast HMR during development:
+## Development Commands
 
 ```bash
 pnpm run dev
-```
-
-Changes to components and routes are reflected instantly in browser.
-
-### Building
-
-```bash
-# Build both client and server
+pnpm run test
+pnpm run typecheck
+pnpm run lint
+pnpm run format
 pnpm run build
-
-# Preview production build
-pnpm run preview
-
-# Deploy to Cloudflare Workers
 pnpm run deploy
 ```
 
-## File Naming Conventions
+## Reusable Implementation Checklist
 
-| Pattern          | Purpose          | Example                              |
-| ---------------- | ---------------- | ------------------------------------ |
-| `index.tsx`      | Route handler    | `/posts/index.tsx` → `/posts/`       |
-| `[param].tsx`    | Dynamic segment  | `/posts/[id].tsx` → `/posts/123`     |
-| `$component.tsx` | Island in routes | `/posts/$like.tsx` (hydrated)        |
-| `_renderer.tsx`  | Global layout    | Must be in `app/routes/`             |
-| `_404.tsx`       | 404 handler      | Custom not-found page                |
-| `_error.tsx`     | Error handler    | Custom error page                    |
-| `.ts`            | API route        | `/api/endpoint.ts` → `/api/endpoint` |
-
-## Project Structure Summary
-
-```
-app/
-├─ islands/
-│  ├─ counter.tsx
-│  └─ [other-interactive-components]
-├─ routes/
-│  ├─ index.tsx               # Home page
-│  ├─ posts/
-│  │  ├─ [id].tsx            # Dynamic post page
-│  │  └─ $post-like.tsx      # Island for inreactive component
-│  ├─ api/
-│  │  └─ hello.ts            # JSON endpoint
-│  ├─ _renderer.tsx           # Global layout
-│  ├─ _404.tsx                # Not found
-│  └─ _error.tsx              # Error page
-├─ components/                 # Shared server components
-│  └─ header.tsx
-├─ utils/                      # Utilities
-│  └─ types.ts                # Shared types
-├─ lib/                        # Shared libraries
-│  └─ fetcher.ts              # Data fetching utilities
-├─ client.ts                   # Client entry
-├─ server.ts                   # Server entry
-└─ global.d.ts                 # Type definitions
-
-public/
-├─ favicon.ico
-└─ [static-assets]       # Static files (images, fonts, etc.)
-
-seeds/                     # Seed data scripts and assets ( for local dev )
-├── r2/                 # R2 seed files
-├── d1/                 # d1 seed files
-├── seed-local-r2.mjs   # R2 seeding script
-├── seed-local-d1.mjs   # D1 seeding script
-└── reset-local.mjs     # Reset local environment script
-
-wrangler.jsonc
-vite.config.ts
-package.json
-```
+1. Keep route naming and dynamic segment conventions consistent
+2. Add interactivity via `app/islands` first, not mixed server files
+3. Centralize storage/data access behind one adapter module
+4. Preserve framework-level not-found/error flow
+5. Keep shared head/layout logic in `_renderer.tsx`
+6. Keep route-level SEO metadata close to each route
+7. Add/maintain tests for parsing/storage utilities when behavior changes
 
 ## References
 

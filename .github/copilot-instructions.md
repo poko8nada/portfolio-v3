@@ -14,6 +14,8 @@
 
 ## Reference Skills
 
+### Available Skills
+
 - Skills are useful for specific contexts.
 - `.github/skills/*/SKILL.md` files define each skill.
 
