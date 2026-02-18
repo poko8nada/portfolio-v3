@@ -1,4 +1,5 @@
 import { createRoute } from 'honox/factory'
+import { Button } from '../../components/button'
 import { PostContent } from '../../components/post-content'
 import { Section } from '../../components/section'
 import { PostList } from '../../features/post-list'
@@ -64,6 +65,10 @@ export default createRoute(async c => {
     return desc
   })()
 
+  const shareUrl = encodeURIComponent(c.req.url)
+  const shareText = encodeURIComponent(postData.title)
+  const twitterShareUrl = `https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareText}`
+
   return c.render(
     <div>
       <title>{title}</title>
@@ -76,8 +81,18 @@ export default createRoute(async c => {
 
       <section class='prose'>
         <PostContent postData={postData} />
+        <div class='mt-24 flex justify-center'>
+          <Button
+            href={twitterShareUrl}
+            target='_blank'
+            variant='secondary'
+            size='lg'
+          >
+            Xでシェアする
+          </Button>
+        </div>
       </section>
-      <hr class='text-text-secondary mt-20 mb-8' />
+      <hr class='text-text-secondary mt-8 mb-8' />
       <Section heading='Recent Posts'>
         <PostList bucket={bucket} displayCount={3} title={postData.title} />
       </Section>
