@@ -12,6 +12,7 @@ const gtmScript = (containerId: string) =>
 
 export default jsxRenderer(({ children }, c) => {
   const gtmContainerId = c.env.GTM_CONTAINER_ID
+  const canonicalUrl = c.req.url.replace(/\/$/, '') // Remove trailing slash for canonical URL
 
   return (
     <html lang='ja' class='scroll-smooth scroll-pt-36'>
@@ -20,13 +21,16 @@ export default jsxRenderer(({ children }, c) => {
         <meta name='viewport' content='width=device-width, initial-scale=1.0' />
         {/* favicon.ico does not work well with some browsers */}
         <link rel='icon' href='/favicon.png' type='image/png' />
+        <link rel='canonical' href={canonicalUrl} />
         {/* OGP Meta Tags */}
         <meta property='og:image' content='/ogp.png' />
         <meta property='og:image:width' content='1200' />
         <meta property='og:image:height' content='630' />
         <meta property='og:type' content='website' />
+        <meta property='og:url' content={canonicalUrl} />
         <meta name='twitter:card' content='summary_large_image' />
         <meta name='twitter:image' content='/ogp.png' />
+        <meta name='twitter:url' content={canonicalUrl} />
         {gtmContainerId ? (
           <script
             dangerouslySetInnerHTML={{

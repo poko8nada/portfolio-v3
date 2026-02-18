@@ -11,6 +11,8 @@ export const Header: FC = () => {
               src='/face.png'
               alt='Poko Hanada'
               class='w-full h-full object-cover'
+              width={64}
+              height={64}
             />
           </div>
           <h1>

@@ -53,9 +53,16 @@ export default createRoute(async c => {
   }
 
   const title = `${postData.title} | Poko Hanada`
-  const description =
-    postData.description ||
-    postData.content.replace(/<[^>]*>?/gm, '').substring(0, 160)
+  const description = (() => {
+    const cleaned = postData.content.replace(/<[^>]*>?/gm, '')
+    const maxLen = 120
+    let desc = cleaned.substring(0, maxLen)
+    const lastPeriod = desc.lastIndexOf('。')
+    if (lastPeriod !== -1) {
+      desc = desc.substring(0, lastPeriod + 1)
+    }
+    return desc
+  })()
 
   return c.render(
     <div>
