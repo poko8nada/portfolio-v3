@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build --mode client && vite build",
+    "dev:remote": "vite build && wrangler dev --remote",
     "preview": "wrangler dev",
     "deploy": "pnpm run build && wrangler deploy",
     "test": "vitest",
@@ -11,8 +12,9 @@
     "format": "biome format --write .",
     "typecheck": "pnpm exec tsc --noEmit",
     "seed:r2": "pnpm run seed:r2:local",
-    "seed:r2:local": "node seeds/r2.mjs --local",
-    "seed:r2:prod": "node seeds/r2.mjs --prod",
+    "sync:r2": "rclone sync r2:portfolio-bucket/ ./seeds/r2/ --progress --transfers=20 --exclude '.DS_Store'",
+    "seed:r2:local": "pnpm run sync:r2 && node seeds/r2.mjs --local",
+    "seed:r2:prod": "pnpm run sync:r2 && node seeds/r2.mjs --prod",
     "seed:reset": "rm -rf .wrangler/state && pnpm run seed:r2:local"
   },
   "private": true,
