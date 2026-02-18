@@ -14,18 +14,20 @@
 
 ## Reference Skills
 
+### Available Skills
+
 - Skills are useful for specific contexts.
 - `.github/skills/*/SKILL.md` files define each skill.
 
 | Skill                 | When Used                                                           |
 | --------------------- | ------------------------------------------------------------------- |
+| `agent-memory`        | Save and recall reusable project knowledge                          |
 | `app-testing`         | Minimal unit test coverage for business logic and API interactions  |
 | `coding-standards`    | Code implementation, refactoring, testing                           |
 | `context7-mcp`        | Access up-to-date, version-specific official documentation and code |
 | `honox-architecture`  | HonoX development, routing, Islands, component patterns             |
 | `nextjs-architecture` | Next.js App Router projects                                         |
 | `planning`            | Planning phase, requirement gathering, task breakdown               |
-| `playwright-mcp`      | Browser automation, web interaction, Playwright MCP                 |
 | `ui-design`           | UI/UX design, styling, accessibility                                |
 
 ### Proactive Use of Skills

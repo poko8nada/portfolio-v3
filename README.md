@@ -34,8 +34,3 @@ pnpm run seed:r2:local
 # production R2 (Cloudflare remote bucket)
 pnpm run seed:r2:prod
 ```
-
-## 運用メモ
-
-- GA4/GTM 設定は Cloudflare ダッシュボード側で実施
-- カスタムドメイン設定は Cloudflare ダッシュボード側で実施

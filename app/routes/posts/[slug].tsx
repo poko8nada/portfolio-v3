@@ -1,4 +1,5 @@
 import { createRoute } from 'honox/factory'
+import { Button } from '../../components/button'
 import { PostContent } from '../../components/post-content'
 import { Section } from '../../components/section'
 import { PostList } from '../../features/post-list'
@@ -53,9 +54,20 @@ export default createRoute(async c => {
   }
 
   const title = `${postData.title} | Poko Hanada`
-  const description =
-    postData.description ||
-    postData.content.replace(/<[^>]*>?/gm, '').substring(0, 160)
+  const description = (() => {
+    const cleaned = postData.content.replace(/<[^>]*>?/gm, '')
+    const maxLen = 120
+    let desc = cleaned.substring(0, maxLen)
+    const lastPeriod = desc.lastIndexOf('。')
+    if (lastPeriod !== -1) {
+      desc = desc.substring(0, lastPeriod + 1)
+    }
+    return desc
+  })()
+
+  const shareUrl = encodeURIComponent(c.req.url)
+  const shareText = encodeURIComponent(postData.title)
+  const twitterShareUrl = `https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareText}`
 
   return c.render(
     <div>
@@ -69,8 +81,18 @@ export default createRoute(async c => {
 
       <section class='prose'>
         <PostContent postData={postData} />
+        <div class='mt-24 flex justify-center'>
+          <Button
+            href={twitterShareUrl}
+            target='_blank'
+            variant='secondary'
+            size='lg'
+          >
+            Xでシェアする
+          </Button>
+        </div>
       </section>
-      <hr class='text-text-secondary mt-20 mb-8' />
+      <hr class='text-text-secondary mt-8 mb-8' />
       <Section heading='Recent Posts'>
         <PostList bucket={bucket} displayCount={3} title={postData.title} />
       </Section>

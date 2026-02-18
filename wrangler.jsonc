@@ -1,37 +1,64 @@
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "portfolio-v3",
-	"main": "./dist/index.js",
-	"compatibility_date": "2026-02-02",
-	"compatibility_flags": [
-		"nodejs_compat"
-	],
-	"assets": {
-		"directory": "./dist"
-	},
-	// "vars": {
-	//   "MY_VAR": "my-variable"
-	// },
-	// "kv_namespaces": [
-	//   {
-	//     "binding": "MY_KV_NAMESPACE",
-	//     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-	//   }
-	// ],
-	"r2_buckets": [
-		{
-			"binding": "POSTS_BUCKET",
-			"bucket_name": "portfolio-bucket"
-		}
-	],
-	// "d1_databases": [
-	//   {
-	//     "binding": "MY_DB",
-	//     "database_name": "my-database",
-	//     "database_id": ""
-	//   }
-	// ],
-	// "ai": {
-	//   "binding": "AI"
-	// }
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": "./dist/index.js",
+  "compatibility_date": "2026-02-02",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "assets": {
+    "directory": "./dist"
+  },
+  "env": {
+    "production":{
+      "name": "portfolio-v3-production",
+      "preview_urls": false,
+      "routes": [{ "custom_domain": true, "pattern": "pokohanada.com" }],
+      "workers_dev": false,
+      // bucket is needed to be defined in each environment
+      "r2_buckets": [
+        {
+          "binding": "POSTS_BUCKET",
+          "bucket_name": "portfolio-bucket"
+        }
+      ],
+    },
+    "staging":{
+      "name": "portfolio-v3-staging",
+      "preview_urls": false,
+      "routes": [{ "custom_domain": true, "pattern": "staging.pokohanada.com" }],
+      "workers_dev": false,
+      // bucket is needed to be defined in each environment
+      "r2_buckets": [
+        {
+          "binding": "POSTS_BUCKET",
+          "bucket_name": "portfolio-bucket"
+        }
+      ],
+    }
+  },
+  "r2_buckets": [
+    {
+      "binding": "POSTS_BUCKET",
+      "bucket_name": "portfolio-bucket"
+    }
+  ],
+  // "vars": {
+  //   "MY_VAR": "my-variable"
+  // },
+  // "kv_namespaces": [
+  //   {
+  //     "binding": "MY_KV_NAMESPACE",
+  //     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  //   }
+  // ],
+  // "d1_databases": [
+  //   {
+  //     "binding": "MY_DB",
+  //     "database_name": "my-database",
+  //     "database_id": ""
+  //   }
+  // ],
+  // "ai": {
+  //   "binding": "AI"
+  // }
 }

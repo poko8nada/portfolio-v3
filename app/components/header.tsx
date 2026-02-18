@@ -1,7 +1,8 @@
 import type { FC } from 'hono/jsx'
 import { TextLink } from './text-link'
 
-export const Header: FC = () => {
+export const Header: FC<{ path: string }> = ({ path }) => {
+  const isHome = path === '/'
   return (
     <header class='mt-2 px-1 fixed max-w-2xl w-full left-1/2 -translate-x-1/2 z-50'>
       <div class='flex items-center justify-between pl-3 pr-6 xs:pr-10 py-3 border border-text-primary rounded-full bg-background shadow-sm'>
@@ -11,6 +12,8 @@ export const Header: FC = () => {
               src='/face.png'
               alt='Poko Hanada'
               class='w-full h-full object-cover'
+              width={64}
+              height={64}
             />
           </div>
           <h1>
@@ -31,7 +34,10 @@ export const Header: FC = () => {
               </TextLink>
             </li>
             <li>
-              <TextLink href='/#posts' class='text-md xs:text-lg font-medium'>
+              <TextLink
+                href={isHome ? '/#posts' : '/posts'}
+                class='text-md xs:text-lg font-medium'
+              >
                 Posts
               </TextLink>
             </li>

@@ -34,11 +34,11 @@ docs/
 │   ├── requirement.template.md
 │   └── tasks-mvp.template.md
 ├── requirement-mvp.md
-├── requirement-v1.md
-├── requirement-v2.md
+├── requirement-v1.md (or requirement-prod1.md)
+├── requirement-v2.md (or requirement-prod2.md)
 ├── tasks-mvp.md
-├── tasks-v1.md
-└── tasks-v2.md
+├── tasks-v1.md (or tasks-prod1.md)
+└── tasks-v2.md (or tasks-prod2.md)
 ```
 
 ### Document Creation
