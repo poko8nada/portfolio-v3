@@ -13,6 +13,7 @@ const gtmScript = (containerId: string) =>
 export default jsxRenderer(({ children }, c) => {
   const gtmContainerId = c.env.GTM_CONTAINER_ID
   const canonicalUrl = c.req.url.replace(/\/$/, '') // Remove trailing slash for canonical URL
+  const path = c.req.path
 
   return (
     <html lang='ja' class='scroll-smooth scroll-pt-36'>
@@ -54,7 +55,7 @@ export default jsxRenderer(({ children }, c) => {
           </noscript>
         ) : null}
         <div class='max-w-2xl mx-auto px-4 min-h-screen flex flex-col'>
-          <Header />
+          <Header path={path} />
           <main class='grow mt-36'>{children}</main>
           <Footer />
         </div>
