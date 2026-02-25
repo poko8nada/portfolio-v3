@@ -65,6 +65,8 @@ export default createRoute(async c => {
     return desc
   })()
 
+  const ogImageURL = `https://image.pokohanada.com/ogp/?title=${encodeURIComponent(postData.title)}&slug=${encodeURIComponent(slug)}`
+
   const shareUrl = encodeURIComponent(c.req.url)
   const shareText = encodeURIComponent(postData.title)
   const twitterShareUrl = `https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareText}`
@@ -76,8 +78,11 @@ export default createRoute(async c => {
       <meta property='og:title' content={title} />
       <meta property='og:description' content={description} />
       <meta property='og:type' content='article' />
+      <meta property='og:image' content={ogImageURL} />
       <meta name='twitter:title' content={title} />
       <meta name='twitter:description' content={description} />
+      <meta name='twitter:card' content='summary_large_image' />
+      <meta name='twitter:image' content={ogImageURL} />
 
       <section class='prose'>
         <PostContent postData={postData} />

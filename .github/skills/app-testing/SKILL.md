@@ -1,15 +1,21 @@
 ---
 name: app-testing
-description: Minimal unit testing toolkit using Vitest for local web applications. Focuses on essential test coverage for critical functionality.
+description: Core Skill. Minimal unit testing toolkit using Vitest for local web applications. Focuses on essential test coverage for critical functionality.
 ---
 
 # Application Testing
 
 - Test business logic and critical functions only
-- When connecting to API, tests for both normal and abnormal cases
+- When connecting to API, tests for both **normal and abnormal cases**
 - Skip UI components and trivial code
 - Place `*.test.ts(x)` adjacent to source files
 - Enable aliases using `vite-tsconfig-paths`
+
+**NOTE**:
+
+- Since Vitest depends on Vite via dependencies, there's no need to install Vite directly.
+- You can also write configuration files in `vitest.config.ts` instead of `vite.config.ts`.
+- It can be said that Vitest itself is designed to be usable without requiring much awareness of Vite's presence.
 
 ## Decision Tree: Choosing Your Test Approach
 
@@ -73,13 +79,13 @@ describe('Button', () => {
 
 ```bash
 # Run all tests
-pnpm test
+pnpm run test
 
 # Watch mode during development
-pnpm test -- --watch
+pnpm run test -- --watch
 
 # Coverage report (optional)
-pnpm test -- --coverage
+pnpm run test -- --coverage
 ```
 
 ## Integration Testing (When Necessary)

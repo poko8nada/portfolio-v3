@@ -1,6 +1,6 @@
 ---
 name: honox-architecture
-description: HonoX architecture guidelines including file-based routing, Islands pattern, component types, performance optimization, and best practices for full-stack development.
+description: Core Skill. HonoX architecture guidelines including file-based routing, Islands pattern, component types, performance optimization, and best practices for full-stack development.
 ---
 
 # HonoX Architecture Guidelines

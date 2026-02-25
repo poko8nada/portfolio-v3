@@ -1,6 +1,6 @@
 ---
 name: agent-memory
-description: Save and recall reusable project knowledge across sessions. Result must be in Japanese.
+description: Core Skill. Save and recall reusable project knowledge across sessions. Result must be in Japanese.
 ---
 
 # Agent Memory Skill

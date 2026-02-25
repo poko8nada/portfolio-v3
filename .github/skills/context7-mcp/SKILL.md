@@ -1,13 +1,14 @@
 ---
 name: context7-mcp
-description: Access up-to-date, version-specific official documentation and code examples for thousands of libraries, frameworks, and tools via the Context7 MCP server.
+description: Core Skill. Access up-to-date, version-specific official documentation and code examples for libraries, frameworks, and tools via the Context7 MCP server.
 ---
 
 # Context7 MCP Skill
 
-## Description
+## Description & purpose
 
-This skill prevents hallucinations, outdated APIs, or deprecated patterns by injecting real, current docs directly into reasoning and code generation.
+This skill prevents hallucinations, outdated APIs, or deprecated patterns by injecting real, current docs directly into reasoning and code generation.  
+Be aware that your knowledge has a **cutoff** point, and recognize the importance of the latest information.
 
 ## When to Use This Skill
 
@@ -15,23 +16,6 @@ This skill prevents hallucinations, outdated APIs, or deprecated patterns by inj
 - Need current best practices, API reference, or examples for a particular version.
 - User mentions phrases like: "latest docs", "current API", "up-to-date", "check the docs", or the skill trigger.
 - Avoid generic/outdated knowledge; always prefer fresh documentation.
-
-## How to Activate
-
-Add one of these trigger phrases at the end (or start) of the prompt/question:
-
-- use context7
-- use latest docs
-- fetch docs with context7
-- get current documentation
-- context7 docs for [library]
-- refer to official docs via context7
-
-Examples:
-
-- "How do I set up server actions in Next.js 15? use context7"
-- "Implement JWT auth with Supabase. use latest docs"
-- "Best way to handle file uploads in FastAPI 0.115? context7"
 
 ## Core Capabilities
 
