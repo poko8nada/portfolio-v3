@@ -65,7 +65,7 @@ export default createRoute(async c => {
     return desc
   })()
 
-  const ogImageURL = `https://image.pokohanada.com/ogp?title=${postData.title}&slug=${slug}`
+  const ogImageURL = `https://image.pokohanada.com/ogp?title=${encodeURIComponent(postData.title)}&slug=${encodeURIComponent(slug)}`
 
   const shareUrl = encodeURIComponent(c.req.url)
   const shareText = encodeURIComponent(postData.title)
