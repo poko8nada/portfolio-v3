@@ -1,6 +1,6 @@
 ---
 name: coding-standards
-description: TypeScript coding standards and best practices.  Use when implementing code, refactoring, writing tests, or reviewing code quality.
+description: Core Skill. TypeScript coding standards and best practices. Use when implementing code, refactoring, writing tests, or reviewing code quality.
 ---
 
 # Coding Standards
@@ -12,6 +12,7 @@ description: TypeScript coding standards and best practices.  Use when implement
 - Algebraic Data Types for type design
 - Early return pattern - avoid deep nesting
 - Handle errors first
+- Decompose long (more than 80 lines of code) components and functions into multiple smaller components and functions.
 - **Imports**: Same directory → `./`. Cross-directory or global → `@/` aliases
 
 ## Type Safety
@@ -84,6 +85,12 @@ Start with **Pattern 1**. Refactor to **Pattern 2** when needed for reuse, testi
 - Server Actions/route handlers returning success/error
 - Hooks/Composables managing operations
 
+### Result<T, E> Decision Criteria
+
+- Use `Result<T, E>` when callers need structured failure reasons (`error`) to decide behavior.
+- Do **not** wrap expected absence/presence checks in `Result` (`cache.match`, `Map.get`, optional lookup). Use `T | undefined` / `T | null` / `boolean`.
+- If absence must be promoted to domain error (e.g., API response mapping to 404/400), convert it at the boundary layer (handler/service), not at low-level adapters.
+
 ### Use try-catch for:
 
 - External operations (I/O, DB, fetch, file system)
@@ -145,12 +152,3 @@ function useCreatePost() {
 
 - Usage examples (use tests instead)
 - Redundant descriptions
-
-### Commands
-
-```bash
-pnpm test              # Run all tests
-pnpm test *.test.tsx   # Run specific test
-```
-
----
