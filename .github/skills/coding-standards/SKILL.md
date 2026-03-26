@@ -1,10 +1,9 @@
 ---
 name: coding-standards
 description: >
-  TypeScript coding patterns and implementation standards for this project.
-  Load when implementing new logic, refactoring existing code, handling errors,
-  or when unsure how to structure state, side effects, or component architecture.
-  Covers Result<T,E> pattern, composable logic design, and component architecture decisions.
+  TypeScript coding patterns and implementation standards. Load when structuring
+  logic, defining boundaries, handling errors, or deciding what belongs in a
+  route, feature, or shared module.
 ---
 
 # Coding Standards
@@ -14,97 +13,129 @@ description: >
 ### Definition
 
 ```typescript
-// shared/types.ts — single source of truth, never redefine per-feature
 type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
 ```
 
-### When to use
+### When to Use
 
-- Internal domain functions where callers need structured failure reasons
-- Server actions / route handlers
-- Hooks / composables managing async operations
+- domain functions that return structured failure
+- route or handler orchestration
+- feature-level async operations
+- client or adapter calls where callers need explicit failure handling
 
-### When NOT to use
+### When NOT to Use
 
-- Expected absence → use `T | undefined` or `T | null`
-- Promote absence to domain error only at the boundary layer (handler/service), never in low-level adapters
+- expected absence — prefer `T | undefined` or `T | null`
+- trivial synchronous code with no meaningful error contract
 
-### Examples
+Promote absence to a domain error only at the boundary that actually owns that
+decision.
 
-```typescript
-// Domain function
-function parseId(input: unknown): Result<string, "Invalid ID"> {
-  return typeof input === "string" && input !== ""
-    ? { ok: true, value: input }
-    : { ok: false, error: "Invalid ID" };
-}
+## Boundary-Driven Organization
 
-// Server action
-export async function createPost(
-  formData: FormData,
-): Promise<Result<Post, string>> {
-  const title = formData.get("title");
-  if (!title) return { ok: false, error: "Title required" };
+Choose module boundaries by ownership, not by habit.
 
-  try {
-    const post = await db.insert({ title });
-    return { ok: true, value: post };
-  } catch (error) {
-    console.error("DB error:", error);
-    return { ok: false, error: "Failed to create post" };
-  }
-}
+## Route or Handler Boundary
 
-// Hook
-function useCreatePost() {
-  const [result, setResult] = useState<Result<Post, string> | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+Owns:
 
-  const create = async (formData: FormData) => {
-    setIsLoading(true);
-    const res = await createPost(formData);
-    setResult(res);
-    setIsLoading(false);
-    return res;
-  };
+framework context
 
-  return { create, result, isLoading };
-}
-```
+- params, query, body, cookies, headers
+- auth/session lookup
+- status codes, redirects, headers, metadata
+- selecting which downstream boundary to call
+
+Should usually not own:
+
+- large nested rendering trees
+- feature-specific transformation logic
+- reusable low-level integration code
+
+## Feature Boundary
+
+Owns:
+
+- nested processing after route inputs are gathered
+- feature-specific state and decision-making
+- medium-sized rendering owned by one capability
+- combining inputs from multiple lower-level helpers
+
+Should usually receive explicit inputs rather than framework context when that
+keeps the contract cleaner.
+
+## Shared Library or Adapter Boundary
+
+Owns:
+
+- reusable infrastructure access
+- parsing and serialization
+- cache helpers
+- normalization utilities
+- low-level client logic
+
+Should not know about route metadata, redirects, or page-level rendering.
+
+## Extraction Rule
+
+Start with the smallest boundary that matches the ownership of the code.
+
+Extract upward only when one of these becomes true:
+
+- the nested behavior is no longer tiny
+- the code has a different reason to change than the caller
+- the code is reused elsewhere
+- the contract becomes important enough to test and evolve independently
+
+Do not extract a file or layer if it does not create a clearer boundary.
 
 ## Composable Logic Design
 
-_Applies to: React Hooks, Vue Composables, Svelte Runes, Solid Primitives, etc._
-
-1. Extract pure logic — separate business logic from framework code
-2. Isolate side effects — keep I/O separate from pure logic
-3. Accept state as arguments — make logic testable
-4. Return computed values — return derived state and operations
+1. isolate pure logic from side effects
+2. make inputs explicit
+3. return derived values instead of duplicating state
+4. keep framework concerns at the edge
 
 ## Component Architecture
 
-### Pattern 1: Direct Import
+### Pattern 1: Route or Container Owns a Small View
 
-Components directly import stores/utilities/logic.
+Use when:
 
-**Use when:** simple single-purpose components, no reuse needs, small-to-medium complexity.
+- the UI is tiny
+- the logic is simple
+- the behavior is not worth its own boundary yet
 
-### Pattern 2: Feature Layer + Presentational Components
+### Pattern 2: Route Delegates to a Feature
 
-Feature layer handles logic, components receive props.
+Use when:
 
-**Use when:** reusable across contexts, complex business logic, clear server/client separation needed.
+- nested processing or rendering is medium or large
+- the feature has its own meaningful inputs and outputs
+- the feature deserves focused tests
 
-**Decision:** start with Pattern 1. Refactor to Pattern 2 when reuse, testing, or complexity demands it.
+### Pattern 3: Feature Uses Shared Components or Libraries
+
+Use when:
+
+- reuse is real
+- multiple features depend on the same lower-level capability
+- a component or helper now has its own independent reason to change
+
+## Error Handling
+
+Use `try-catch` for external I/O and impure boundaries.
+Return structured errors rather than throwing across module boundaries.
+
+When catching external I/O failures:
+
+- log deliberately
+- map to a clear error contract
+- avoid silent fallbacks that hide failure
 
 ## Comments
 
-Only for:
+Comment only when the intent cannot be made obvious with names, types, or
+structure.
 
-- Complex type hints that cannot be expressed in code
-- Critical non-obvious logic (with ADR reference if applicable)
-
-Never for:
-
-- Usage examples — write tests instead
-- Redundant descriptions of what the code does
+Do not use comments to compensate for muddy boundaries.

@@ -1,119 +1,208 @@
 ---
 name: new-feature
 description: >
-  Implements a new feature using vertical slice architecture and skeleton-first approach.
-  Load when adding a new feature, route, or domain concept to the project.
-  Covers file structure, colocation pattern, implementation order, and
-  how to verify completion. Works regardless of framework.
+  Implements a new feature using docs-first delivery, boundary-driven structure,
+  and skeleton-first execution. Load when adding a route, feature, or new
+  user-visible behavior.
 ---
 
 # New Feature
 
-## Approach: Skeleton First
+## Purpose
 
-Build in this order — each step must compile and type-check before proceeding:
+Use this skill when adding a feature, not just when writing code in isolation.
+
+The goal is to choose boundaries deliberately:
+
+- route or handler boundaries for transport and framework concerns
+- feature boundaries for nested processing and rendering
+- shared libraries or adapters for reusable low-level capabilities
+
+Do not create files and layers just to satisfy a template.
+Create them because they own a distinct reason to change.
+
+## Precondition: Docs Must Be Implementable
+
+Before coding, check whether the repository docs are concrete enough to build
+from without chat history.
+
+If the task depends on values such as:
+
+- route paths
+- input shapes
+- storage keys
+- binding or environment variable names
+- success behavior
+- failure behavior
+
+and those values are still vague, tighten the docs first.
+
+## Delivery Order: Skeleton First
+
+Build in this order:
 
 1. **Types** — define the shape of data and errors
-2. **Interfaces** — define function signatures with `Result<T,E>` return types
-3. **Tests** — write tests against the interfaces (they will fail at this stage)
+2. **Interfaces** — define the boundary API
+3. **Tests** — write tests against that boundary
 4. **Implementation** — fill in logic until tests pass
 
-This order ensures the agent never declares completion without verification.
-Type errors and failing tests are the definition of "not done".
+This keeps the design explicit and prevents "done" from meaning
+"probably works."
+
+## Choose Boundaries by Ownership
+
+## Route or Handler Boundary
+
+A route or handler owns framework-facing concerns.
+
+Typical responsibilities:
+
+- path, query, params, body, cookies, headers
+- request-scoped context, env, auth/session access
+- status codes, redirects, headers, metadata
+- deciding which feature or service to call
+- rendering or returning the top-level response
+
+Routes should not absorb every detail below them.
+They should gather inputs, call the right boundary, and own the response
+contract.
+
+## Feature Boundary
+
+A feature owns nested behavior once the route has supplied explicit inputs.
+
+Typical responsibilities:
+
+- transforming route inputs into feature data
+- loading or combining data for one user-facing capability
+- rendering nested views, sections, forms, panels, or composed UI
+- feature-specific error mapping
+- feature-specific state transitions and decisions
+
+Good feature boundaries are driven by one capability, not by a directory rule.
+
+## Shared Library or Adapter Boundary
+
+Shared libraries or adapters own reusable capabilities that should not care
+which route or feature called them.
+
+Typical responsibilities:
+
+- API clients
+- storage access
+- parsers and serializers
+- normalization helpers
+- cache helpers
+- cross-feature utility logic
+
+If multiple features would need the same low-level behavior, it likely belongs
+here instead of inside one feature.
 
 ## Colocation Pattern
 
-Every file that belongs to a feature lives alongside it.
-Never scatter related files across separate top-level directories.
+When a feature boundary exists, colocate the files that belong to it.
 
-```
+```text
 [feature-name]/
-├── index.ts              # public API — only export what callers need
-├── [feature].ts          # core logic
-├── [feature].types.ts    # types and error definitions
-├── [feature].schema.ts   # validation schemas (Zod etc.) if needed
-└── [feature].test.ts     # tests colocated here, not in __tests__/
+├── index.ts
+├── [feature].ts
+├── [feature].tsx      # primary component
+├── [feature]-card.tsx # sub-component
+├── [feature].types.ts
+└── [feature].test.ts
 ```
 
-Place this slice wherever your framework dictates — inside `app/`, `src/`, `routes/`,
-or a monorepo package. The internal structure above applies regardless.
+Use `index.ts` as the public boundary when the feature is imported from
+elsewhere.
 
-## Step 1: Types
+This pattern includes not only logic and types, but also the UI component(s) that belong to the feature. A [feature].tsx file colocates the view layer alongside its data and business logic, avoiding the need for a separate components/ directory at the feature level.
 
-```typescript
-// [feature].types.ts
-import type { Result } from "@/shared/types";
+- Next.js App Router
+- Remix
+- React Router data routers
+- Nuxt
+- SvelteKit
+- SolidStart
+- HonoX
+- Astro
 
-export type [Feature] = {
-  id: string;
-  // ...
-};
+## Feature Slices Are Optional
 
-export type [Feature]Error =
-  | "not-found"
-  | "invalid-input"
-  | "unauthorized";
+Do not create a feature slice only because a route has logic.
 
-export type [Feature]Result = Result<[Feature], [Feature]Error>;
-```
+Keep code local to the route when it is:
 
-## Step 2: Interfaces
+- tiny
+- truly route-specific
+- unlikely to be reused
+- mostly transport glue rather than nested behavior
 
-```typescript
-// [feature].ts — signatures only, no implementation yet
-import type { [Feature]Result } from "./[feature].types";
+Promote route-local code into a feature when:
 
-export async function get[Feature](id: string): Promise<[Feature]Result> {
-  throw new Error("not implemented");
-}
+- the nested behavior is no longer tiny
+- there is meaningful processing after route inputs are gathered
+- the rendering below the route deserves its own ownership
+- the same capability may be reused by another route or context
 
-export async function create[Feature](
-  input: unknown,
-): Promise<[Feature]Result> {
-  throw new Error("not implemented");
-}
-```
+Practical rule:
 
-## Step 3: Tests
+- tiny route-owned behavior can stay in the route file
+- medium feature-owned behavior should move into a feature boundary
+- reusable low-level behavior should move into shared libraries or adapters
 
-```typescript
-// [feature].test.ts
-import { describe, it, expect } from "vitest";
-import { get[Feature], create[Feature] } from "./[feature]";
+## Types Files Are Optional
 
-describe("get[Feature]", () => {
-  it("returns feature when found", async () => {
-    const result = await get[Feature]("valid-id");
-    expect(result.ok).toBe(true);
-  });
+Do not create `[feature].types.ts` just because a template says so.
 
-  it("returns not-found error for unknown id", async () => {
-    const result = await get[Feature]("unknown-id");
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error).toBe("not-found");
-  });
-});
-```
+Create a separate types file only when:
 
-## Step 4: Implementation
+- multiple files in the boundary share those types
+- the types clarify the public contract
+- the contract is important enough to deserve its own surface
 
-Fill in logic until all tests pass. Use `try-catch` only for external I/O.
-Return `Result<T,E>` — never throw across module boundaries.
+Do not use a types file as a dumping ground for unrelated constants.
 
-## index.ts — Public API
+## Medium-Sized Components Are Allowed
 
-```typescript
-// Only export what callers outside this slice need
-export type { [Feature], [Feature]Error } from "./[feature].types";
-export { get[Feature], create[Feature] } from "./[feature]";
-```
+It is acceptable to keep medium-sized feature-local UI inside the same boundary.
 
-Never import from inside a slice except through its `index.ts`.
-This enforces the boundary and keeps grep-ability intact.
+Good fit:
+
+- feature-owned views
+- sections and panels
+- composed cards
+- forms tied to one feature flow
+- UI that depends mainly on one feature's inputs or state
+
+Promote to shared components only when reuse is real.
+
+## Test Layers by Responsibility
+
+Do not split tests by folder name alone.
+Split them by owned contract.
+
+Use feature tests for:
+
+- nested processing and rendering
+- feature-specific data combination
+- feature-specific error mapping
+- feature state and decisions
+
+Use shared library or adapter tests for:
+
+- parsers
+- storage access
+- client behavior
+- cache logic
+- normalization helpers
+
+If two test files assert the same behavior at different layers, one of them is
+probably too low-level or too high-level.
 
 ## Completion Checklist
 
-- [ ] `pnpm tsc --noEmit` passes
-- [ ] `pnpm test` passes including all error paths
-- [ ] `pnpm oxlint .` passes
-- [ ] Public API is exported only through `index.ts`
+- [ ] docs were concrete enough to implement from, or were tightened first
+- [ ] route, feature, and shared boundaries were chosen by ownership
+- [ ] files were added because they own a distinct reason to change
+- [ ] tests match the owned contract of each boundary
+- [ ] the repository's existing validation commands pass

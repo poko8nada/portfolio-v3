@@ -16,6 +16,8 @@ phase: current
 ### Acceptance Criteria
 
 - [REQ-001] Given 任意の公開ページ, When ページが描画される, Then ヘッダーに `About` `Posts` `Tools` への導線が表示される。
+- [REQ-001] Given `/`, When `About` ナビゲーションを選択する, Then `#about` セクションへ移動できる。
+- [REQ-001] Given ホーム以外のページ, When `About` ナビゲーションを選択する, Then `/about` に遷移できる。
 - [REQ-001] Given ホーム以外のページ, When `Posts` ナビゲーションを選択する, Then `/posts` に遷移できる。
 - [REQ-002] Given 任意の公開ページ, When HTML を確認する, Then canonical URL が末尾スラッシュを除去した現在 URL で出力される。
 - [REQ-002] Given 記事詳細ページ以外, When HTML を確認する, Then 共有画像として `/ogp.png` が設定される。
@@ -37,6 +39,7 @@ phase: current
 
 - [REQ-010] 閲覧者は、ホームページで運営者の自己紹介、外部プロフィール導線、最近の記事、制作物一覧を確認できなければならない。
 - [REQ-011] 閲覧者は、ホームページから記事一覧ページへ移動できなければならない。
+- [REQ-012] 閲覧者は、ホームページの About セクションから詳細なプロフィールページへ移動できなければならない。
 
 ### Acceptance Criteria
 
@@ -45,6 +48,7 @@ phase: current
 - [REQ-010] Given `/`, When `Posts` セクションを見る, Then公開記事一覧から最大 3 件が表示される。
 - [REQ-010] Given `/`, When `Tools` セクションを見る, Then固定の外部制作物リンク一覧が表示される。
 - [REQ-011] Given `/`, When `すべての記事 →` を選択する, Then `/posts` に遷移できる。
+- [REQ-012] Given `/`, When About セクションの詳細導線を選択する, Then `/about` に遷移できる。
 
 ### Edge Cases
 
@@ -53,6 +57,36 @@ phase: current
 ### Why Not
 
 - 制作物一覧を CMS 化する方式: 現行実装では固定配列で十分であり、更新対象が少ないため不採用。
+
+## About 詳細ページ
+
+### Requirements
+
+- [REQ-015] 閲覧者は、`/about` で運営者のスキル詳細を Markdown 由来の HTML として閲覧できなければならない。
+- [REQ-016] システムは、`/about` 用コンテンツを `RESUME_ASSETS_BUCKET` にバインドされた R2 バケット `portfolio-resume-assets` から取得しなければならない。
+- [REQ-017] システムは、初版 `/about` の本文ソースとして `resume/skills_20250728161256.md` だけを読み出さなければならない。
+- [REQ-018] システムは、about ページ用 Markdown の取得または変換に失敗した場合、部分的に欠けた成功画面を返してはならない。
+
+### Acceptance Criteria
+
+- [REQ-015] Given `/about`, When ページを表示する, Then `resume/skills_20250728161256.md` の Markdown から変換された HTML 本文が表示される。
+- [REQ-015] Given `/about`, When ページを表示する, Then ページタイトルは `About | Poko Hanada` になる。
+- [REQ-016] Given Workers 環境に `RESUME_ASSETS_BUCKET` が設定され、その実体が `portfolio-resume-assets` である, When `/about` を表示する, Then about コンテンツ取得は `POSTS_BUCKET` ではなく `RESUME_ASSETS_BUCKET` を使う。
+- [REQ-017] Given `RESUME_ASSETS_BUCKET` に `resume/skills_20250728161256.md` が存在する, When `/about` を表示する, Then そのオブジェクトだけが about 本文ソースとして使われる。
+- [REQ-017] Given `RESUME_ASSETS_BUCKET` に他の Markdown が存在しても, When `/about` を表示する, Then それらは自動列挙や自動結合の対象にならない。
+- [REQ-018] Given `resume/skills_20250728161256.md` が取得できない, When `/about` を表示する, Then 一部欠けた本文ではなくエラー画面を返す。
+- [REQ-018] Given `resume/skills_20250728161256.md` の Markdown 変換に失敗する, When `/about` を表示する, Then 一部欠けた本文ではなくエラー画面を返す。
+
+### Edge Cases
+
+- 初版 `/about` は 1 オブジェクト固定で、バケット列挙結果やファイル名ソート結果に依存しない。
+- `resume/skills_20250728161256.md` に frontmatter がなくても、Markdown 本文を HTML に変換して表示できれば要件を満たす。
+- 初版では複数ファイルの必須/任意判定を持ち込まない。
+
+### Why Not
+
+- about 用 Markdown を `POSTS_BUCKET` に混在させる方式: 記事公開用コンテンツ契約とプロフィール資料の責務が混ざるため不採用。
+- 初版から複数 Markdown を列挙して組み立てる方式: 現時点で確定している入力は `resume/skills_20250728161256.md` のみで、未確定ルールを仕様へ持ち込みたくないため不採用。
 
 ## 記事一覧とタグ導線
 

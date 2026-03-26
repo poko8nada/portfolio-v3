@@ -25,6 +25,9 @@ should be — docs/spec.md is for what cannot.
 - **External interfaces**: API contracts, third-party integrations, data formats
 - **Why Not**: why alternative approaches were rejected for each requirement
 
+The bar is: a fresh agent should be able to implement from `docs/spec.md`
+without needing the originating chat.
+
 ## What NOT to write
 
 - Implementation details — how the system works belongs in code
@@ -70,6 +73,25 @@ phase: current
 - One criterion per observable behavior
 - Error paths are first-class requirements — not afterthoughts
 - If a criterion can be directly expressed as a test, write the test instead
+- Include exact route paths, binding names, environment variables, object keys,
+  query parameters, or file patterns when they are part of the behavior
+- State required vs optional inputs explicitly
+- State what happens on failure explicitly
+- Avoid vague nouns like "専用バケット", "対象ファイル", or "適切な値"
+
+## Concreteness guide
+
+Write:
+
+- what exact input is read
+- from where it is read
+- what page or API exposes it
+- what success looks like
+- what failure looks like
+- what this iteration explicitly does not do
+
+If a value is still unknown and implementation would branch based on it, ask
+before treating the spec as complete.
 
 ## Maintenance rule
 

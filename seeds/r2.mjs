@@ -2,8 +2,16 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
-const bucket = 'portfolio-bucket';
-const sourceDir = path.resolve('./seeds/r2');
+const SEED_TARGETS = [
+  {
+    bucket: 'portfolio-bucket',
+    sourceDir: path.resolve('./seeds/r2'),
+  },
+  {
+    bucket: 'portfolio-resume-assets',
+    sourceDir: path.resolve('./seeds/resume-assets'),
+  },
+];
 
 const modeArg = process.argv[2] ?? '--local';
 const isProd = modeArg === '--prod';
@@ -20,22 +28,28 @@ if (modeArg === '--help') {
 
 const targetFlag = isProd ? '--remote' : '--local';
 
-function uploadDir(dir) {
+function uploadDir(bucket, sourceDir, dir) {
   const files = fs.readdirSync(dir, { withFileTypes: true });
   for (const file of files) {
     if (file.name.startsWith('.')) continue;
     const fullPath = path.join(dir, file.name);
     if (file.isDirectory()) {
-      uploadDir(fullPath);
+      uploadDir(bucket, sourceDir, fullPath);
     } else {
       const key = path.relative(sourceDir, fullPath);
       const cmd = `pnpm exec wrangler r2 object put "${bucket}/${key}" --file="${fullPath}" ${targetFlag}`;
-      process.stdout.write(`Uploading: ${key}\n`);
+      process.stdout.write(`Uploading to ${bucket}: ${key}\n`);
       execSync(cmd, { stdio: 'inherit' });
     }
   }
 }
 
 process.stdout.write(`Seeding target: ${isProd ? 'production' : 'local'}\n`);
-uploadDir(sourceDir);
+for (const target of SEED_TARGETS) {
+  if (!fs.existsSync(target.sourceDir)) {
+    process.stdout.write(`Skipping missing source directory: ${target.sourceDir}\n`);
+    continue;
+  }
+  uploadDir(target.bucket, target.sourceDir, target.sourceDir);
+}
 process.stdout.write('Seeding done!\n');

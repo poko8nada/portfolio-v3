@@ -16,12 +16,17 @@ ADRs record the Why and Why Not behind significant decisions.
 They are append-only — never rewrite, only supersede.
 Agents use status fields to determine which decisions are currently active.
 
+When an ADR fixes an architectural boundary, it must also record the concrete
+decision values that make implementation possible.
+
 ## What qualifies as an ADR
 
 - Choosing between technical approaches with non-obvious trade-offs
 - Establishing a project-wide pattern (error handling, state management, etc.)
 - Rejecting a reasonable alternative that might be reconsidered later
 - Decisions driven by external constraints (legal, SLA, org policy)
+- Fixing concrete system boundaries such as route ownership, binding names,
+  storage locations, integration contracts, or failure policy
 
 ## What does NOT qualify
 
@@ -76,6 +81,29 @@ What trade-offs were accepted?]
 [What becomes easier or harder as a result of this decision?
 What future decisions does this constrain?]
 ```
+
+## Concreteness rule
+
+If the ADR decides a concrete value, write the exact value.
+
+Good examples:
+
+- `RESUME_ASSETS_BUCKET`
+- `portfolio-resume-assets`
+- `/about`
+- `resume/skills_20250728161256.md`
+
+Bad examples:
+
+- "専用バケット"
+- "skills 系の Markdown"
+- "about 用の別ルート"
+
+An ADR is not an implementation plan, but it must be specific enough that a
+fresh implementer understands the fixed boundary without additional chat.
+
+If the exact value is not yet known and implementation depends on it, ask the
+user before finalizing the ADR.
 
 ## Naming convention
 
