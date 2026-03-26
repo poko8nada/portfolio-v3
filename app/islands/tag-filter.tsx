@@ -1,10 +1,10 @@
-import { useState } from 'hono/jsx'
+import React, { useState } from 'hono/jsx';
 
 export default function TagFilter({ tag }: { tag: string | null }) {
-  const [selectedTag, setSelectedTag] = useState(tag)
+  const [selectedTag, setSelectedTag] = useState(tag);
 
   if (!selectedTag) {
-    return <div class='mb-3 h-8' />
+    return <div class='mb-3 h-8' />;
   }
 
   return (
@@ -15,8 +15,8 @@ export default function TagFilter({ tag }: { tag: string | null }) {
           type='button'
           class='ml-1 cursor-pointer text-text-secondary transition-colors hover:text-text-primary flex items-center justify-center'
           onClick={() => {
-            setSelectedTag(null)
-            window.location.assign('/posts')
+            setSelectedTag(null);
+            window.location.assign('/posts');
           }}
           aria-label='Remove filter'
         >
@@ -39,5 +39,5 @@ export default function TagFilter({ tag }: { tag: string | null }) {
         </button>
       </div>
     </div>
-  )
+  );
 }

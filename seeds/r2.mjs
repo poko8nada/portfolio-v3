@@ -9,12 +9,12 @@ const modeArg = process.argv[2] ?? '--local';
 const isProd = modeArg === '--prod';
 
 if (!['--local', '--prod', '--help'].includes(modeArg)) {
-  console.error('Invalid mode. Use --local or --prod.');
+  process.stderr.write('Invalid mode. Use --local or --prod.\n');
   process.exit(1);
 }
 
 if (modeArg === '--help') {
-  console.log('Usage: node seeds/r2.mjs [--local|--prod]');
+  process.stdout.write('Usage: node seeds/r2.mjs [--local|--prod]\n');
   process.exit(0);
 }
 
@@ -30,12 +30,12 @@ function uploadDir(dir) {
     } else {
       const key = path.relative(sourceDir, fullPath);
       const cmd = `pnpm exec wrangler r2 object put "${bucket}/${key}" --file="${fullPath}" ${targetFlag}`;
-      console.log(`Uploading: ${key}`);
+      process.stdout.write(`Uploading: ${key}\n`);
       execSync(cmd, { stdio: 'inherit' });
     }
   }
 }
 
-console.log(`Seeding target: ${isProd ? 'production' : 'local'}`);
+process.stdout.write(`Seeding target: ${isProd ? 'production' : 'local'}\n`);
 uploadDir(sourceDir);
-console.log('Seeding done!');
+process.stdout.write('Seeding done!\n');

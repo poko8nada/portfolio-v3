@@ -1,14 +1,15 @@
-import { createRoute } from 'honox/factory'
-import { Section } from '../../components/section'
-import { PostList } from '../../features/post-list'
-import TagFilter from '../../islands/tag-filter'
+import React from 'hono/jsx';
+import { createRoute } from 'honox/factory';
+import { Section } from '../../components/section';
+import { PostList } from '../../features/post-list';
+import TagFilter from '../../islands/tag-filter';
 
-export default createRoute(async c => {
-  const tag = c.req.query('tag') || null
-  const title = tag ? `Posts: ${tag} | Poko Hanada` : 'Posts | Poko Hanada'
+export default createRoute(async (c) => {
+  const tag = c.req.query('tag') || null;
+  const title = tag ? `Posts: ${tag} | Poko Hanada` : 'Posts | Poko Hanada';
   const description = tag
     ? `Poko Hanadaによる「${tag}」タグの記事一覧です。`
-    : 'Poko Hanadaによる記事一覧です。'
+    : 'Poko Hanadaによる記事一覧です。';
 
   return c.render(
     <div>
@@ -28,5 +29,5 @@ export default createRoute(async c => {
         />
       </Section>
     </div>,
-  )
-})
+  );
+});

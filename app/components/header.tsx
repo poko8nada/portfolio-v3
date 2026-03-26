@@ -1,8 +1,8 @@
-import type { FC } from 'hono/jsx'
-import { TextLink } from './text-link'
+import React, { type FC } from 'hono/jsx';
+import { TextLink } from './text-link';
 
 export const Header: FC<{ path: string }> = ({ path }) => {
-  const isHome = path === '/'
+  const isHome = path === '/';
   return (
     <header class='mt-2 px-1 fixed max-w-2xl w-full left-1/2 -translate-x-1/2 z-50'>
       <div class='flex items-center justify-between pl-3 pr-6 xs:pr-10 py-3 border border-text-primary rounded-full bg-background shadow-sm'>
@@ -17,10 +17,7 @@ export const Header: FC<{ path: string }> = ({ path }) => {
             />
           </div>
           <h1>
-            <a
-              href='/'
-              class='text-text-primary text-lg xs:text-2xl tracking-tighter mr-2'
-            >
+            <a href='/' class='text-text-primary text-lg xs:text-2xl tracking-tighter mr-2'>
               Poko <br class='xs:hidden' />
               Hanada
             </a>
@@ -34,10 +31,7 @@ export const Header: FC<{ path: string }> = ({ path }) => {
               </TextLink>
             </li>
             <li>
-              <TextLink
-                href={isHome ? '/#posts' : '/posts'}
-                class='text-md xs:text-lg font-medium'
-              >
+              <TextLink href={isHome ? '/#posts' : '/posts'} class='text-md xs:text-lg font-medium'>
                 Posts
               </TextLink>
             </li>
@@ -50,5 +44,5 @@ export const Header: FC<{ path: string }> = ({ path }) => {
         </nav>
       </div>
     </header>
-  )
-}
+  );
+};
