@@ -1,9 +1,10 @@
-import type { PostData } from '../lib/markdown'
-import { Button } from './button'
+import React from 'hono/jsx';
+import type { PostData } from '../lib/markdown';
+import { Button } from './button';
 
 export const PostContent = ({ postData }: { postData: PostData }) => {
   if (!postData.isPublished) {
-    return <div>This post is not published.</div>
+    return <div>This post is not published.</div>;
   }
   return (
     <article class='px-2'>
@@ -12,8 +13,8 @@ export const PostContent = ({ postData }: { postData: PostData }) => {
         {new Date(postData.createdAt).toLocaleDateString('ja-JP', {})}
       </div>
       <div class='mt-2 mb-16'>
-        {postData.tags?.map(tag => (
-          <Button size='sm' href={`/posts?tag=${tag}`}>
+        {postData.tags?.map((tag) => (
+          <Button key={tag} size='sm' href={`/posts?tag=${tag}`}>
             {tag}
           </Button>
         ))}
@@ -21,5 +22,5 @@ export const PostContent = ({ postData }: { postData: PostData }) => {
 
       <div dangerouslySetInnerHTML={{ __html: postData.content }} />
     </article>
-  )
-}
+  );
+};

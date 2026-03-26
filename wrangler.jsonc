@@ -2,14 +2,12 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "main": "./dist/index.js",
   "compatibility_date": "2026-02-02",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
+  "compatibility_flags": ["nodejs_compat"],
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
   },
   "env": {
-    "production":{
+    "production": {
       "name": "portfolio-v3-production",
       "preview_urls": false,
       "routes": [{ "custom_domain": true, "pattern": "pokohanada.com" }],
@@ -18,11 +16,11 @@
       "r2_buckets": [
         {
           "binding": "POSTS_BUCKET",
-          "bucket_name": "portfolio-bucket"
-        }
+          "bucket_name": "portfolio-bucket",
+        },
       ],
     },
-    "staging":{
+    "staging": {
       "name": "portfolio-v3-staging",
       "preview_urls": false,
       "routes": [{ "custom_domain": true, "pattern": "staging.pokohanada.com" }],
@@ -31,16 +29,16 @@
       "r2_buckets": [
         {
           "binding": "POSTS_BUCKET",
-          "bucket_name": "portfolio-bucket"
-        }
+          "bucket_name": "portfolio-bucket",
+        },
       ],
-    }
+    },
   },
   "r2_buckets": [
     {
       "binding": "POSTS_BUCKET",
-      "bucket_name": "portfolio-bucket"
-    }
+      "bucket_name": "portfolio-bucket",
+    },
   ],
   // "vars": {
   //   "MY_VAR": "my-variable"

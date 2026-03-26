@@ -1,106 +1,37 @@
 ---
 name: coding-standards
-description: Core Skill. TypeScript coding standards and best practices. Use when implementing code, refactoring, writing tests, or reviewing code quality.
+description: >
+  TypeScript coding patterns and implementation standards for this project.
+  Load when implementing new logic, refactoring existing code, handling errors,
+  or when unsure how to structure state, side effects, or component architecture.
+  Covers Result<T,E> pattern, composable logic design, and component architecture decisions.
 ---
 
 # Coding Standards
 
-## Core Principles
+## Result<T, E>
 
-- **Functional Domain Modeling** design
-- Use functions - no `class`
-- Algebraic Data Types for type design
-- Early return pattern - avoid deep nesting
-- Handle errors first
-- Decompose long (more than 80 lines of code) components and functions into multiple smaller components and functions.
-- **Imports**: Same directory → `./`. Cross-directory or global → `@/` aliases
-
-## Type Safety
-
-### Rules
-
-- Never use `any` - define explicit types
-- Avoid type assertions (`as`) when possible
-- Resolve type errors immediately
-- Prefer union types and discriminated unions
-
-### Global Types
-
-Only universal types (e.g., `Result<T, E>`) in `utils/types.ts`
-
-## State Management
-
-- **Derive, Don't Duplicate**: If state B can be computed from state A, compute B from A
-- **Pure Functions First**: Extract pure logic into testable functions. Isolate side effects.
-- **Tool Selection**: Use framework-appropriate stores (Zustand, Pinia, Nanostores, etc.)
-- **Server-driven frameworks**: State lives on server, HTML represents state
-
-## Composable Logic Design
-
-_Applies to: React Hooks, Vue Composables, Svelte Runes, Solid Primitives, etc._
-
-1. **Extract pure logic** - Separate business logic from framework code
-2. **Isolate side effects** - Keep I/O separate from pure logic
-3. **Accept state as arguments** - Make logic testable
-4. **Return computed values** - Return derived state and operations
-
-## Component Architecture Patterns
-
-### Pattern 1: Direct Import
-
-Components directly import stores/utilities/logic.
-
-**Use when:**
-
-- Simple, single-purpose components
-- No reuse needs
-- Small to medium complexity
-
-**Trade-offs:** Simple, less boilerplate | Harder to test, lower reusability
-
-### Pattern 2: Feature Layer + Presentational Components
-
-Feature layer handles logic, components receive props.
-
-**Use when:**
-
-- Reusable across contexts
-- Design systems/Storybook
-- Complex business logic
-- Clear server/client separation needed
-
-**Trade-offs:** Testable, reusable, clear separation | More boilerplate, can be over-engineering
-
-### Decision
-
-Start with **Pattern 1**. Refactor to **Pattern 2** when needed for reuse, testing, or complexity.
-
-## Error Handling
-
-### Never use exceptions for control flow
-
-### Use Result<T, E> Pattern for:
-
-- Internal logic and domain functions
-- Server Actions/route handlers returning success/error
-- Hooks/Composables managing operations
-
-### Result<T, E> Decision Criteria
-
-- Use `Result<T, E>` when callers need structured failure reasons (`error`) to decide behavior.
-- Do **not** wrap expected absence/presence checks in `Result` (`cache.match`, `Map.get`, optional lookup). Use `T | undefined` / `T | null` / `boolean`.
-- If absence must be promoted to domain error (e.g., API response mapping to 404/400), convert it at the boundary layer (handler/service), not at low-level adapters.
-
-### Use try-catch for:
-
-- External operations (I/O, DB, fetch, file system)
-- Always log: `console.error(error)` in catch blocks
-
-### Result Pattern Examples
+### Definition
 
 ```typescript
+// shared/types.ts — single source of truth, never redefine per-feature
 type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
+```
 
+### When to use
+
+- Internal domain functions where callers need structured failure reasons
+- Server actions / route handlers
+- Hooks / composables managing async operations
+
+### When NOT to use
+
+- Expected absence → use `T | undefined` or `T | null`
+- Promote absence to domain error only at the boundary layer (handler/service), never in low-level adapters
+
+### Examples
+
+```typescript
 // Domain function
 function parseId(input: unknown): Result<string, "Invalid ID"> {
   return typeof input === "string" && input !== ""
@@ -108,7 +39,7 @@ function parseId(input: unknown): Result<string, "Invalid ID"> {
     : { ok: false, error: "Invalid ID" };
 }
 
-// Server Action (example)
+// Server action
 export async function createPost(
   formData: FormData,
 ): Promise<Result<Post, string>> {
@@ -124,7 +55,7 @@ export async function createPost(
   }
 }
 
-// Hook/Composable (example)
+// Hook
 function useCreatePost() {
   const [result, setResult] = useState<Result<Post, string> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -141,14 +72,39 @@ function useCreatePost() {
 }
 ```
 
+## Composable Logic Design
+
+_Applies to: React Hooks, Vue Composables, Svelte Runes, Solid Primitives, etc._
+
+1. Extract pure logic — separate business logic from framework code
+2. Isolate side effects — keep I/O separate from pure logic
+3. Accept state as arguments — make logic testable
+4. Return computed values — return derived state and operations
+
+## Component Architecture
+
+### Pattern 1: Direct Import
+
+Components directly import stores/utilities/logic.
+
+**Use when:** simple single-purpose components, no reuse needs, small-to-medium complexity.
+
+### Pattern 2: Feature Layer + Presentational Components
+
+Feature layer handles logic, components receive props.
+
+**Use when:** reusable across contexts, complex business logic, clear server/client separation needed.
+
+**Decision:** start with Pattern 1. Refactor to Pattern 2 when reuse, testing, or complexity demands it.
+
 ## Comments
 
-### Only for:
+Only for:
 
-- Complex type hints
-- Critical non-obvious logic
+- Complex type hints that cannot be expressed in code
+- Critical non-obvious logic (with ADR reference if applicable)
 
-### Never for:
+Never for:
 
-- Usage examples (use tests instead)
-- Redundant descriptions
+- Usage examples — write tests instead
+- Redundant descriptions of what the code does

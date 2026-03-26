@@ -1,13 +1,13 @@
-import type { Child, FC } from 'hono/jsx'
+import React, { type Child, type FC } from 'hono/jsx';
 
 type Props = {
-  href: string
-  children: Child
-  variant?: 'primary' | 'secondary'
-  class?: string
-  size?: 'sm' | 'md' | 'lg'
-  target?: string
-}
+  href: string;
+  children: Child;
+  variant?: 'primary' | 'secondary';
+  class?: string;
+  size?: 'sm' | 'md' | 'lg';
+  target?: string;
+};
 
 export const Button: FC<Props> = ({
   href,
@@ -21,13 +21,11 @@ export const Button: FC<Props> = ({
     sm: 'px-2 py-[.2em] text-xs min-w-12 ',
     md: 'px-3 py-3 text-sm min-w-25 ',
     lg: 'px-4 py-3 text-base min-w-30 ',
-  }
+  };
   const variantClasses: Record<NonNullable<Props['variant']>, string> = {
-    primary:
-      'border-text-primary border text-text-primary hover:text-text-secondary ',
-    secondary:
-      'border-text-secondary border text-text-secondary hover:text-text-primary ',
-  }
+    primary: 'border-text-primary border text-text-primary hover:text-text-secondary ',
+    secondary: 'border-text-secondary border text-text-secondary hover:text-text-primary ',
+  };
 
   return (
     <a
@@ -38,5 +36,5 @@ export const Button: FC<Props> = ({
     >
       {children}
     </a>
-  )
-}
+  );
+};

@@ -1,84 +1,105 @@
-import { matter } from 'gray-matter-es'
-import rehypeStringify from 'rehype-stringify'
-import remarkParse from 'remark-parse'
-import remarkRehype from 'remark-rehype'
-import { unified } from 'unified'
-import { err, ok, type Result } from '../utils/types'
+import { matter } from 'gray-matter-es';
+import rehypeStringify from 'rehype-stringify';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import { unified } from 'unified';
+import { err, ok, type Result } from '../utils/types';
 
-type MetaDate = {
-  title: string
-  createdAt: string
-  updatedAt?: string
-  isPublished: boolean
-  tags?: string[]
-  version?: number
-  [key: string]: any
-}
+type FrontmatterData = Record<string, unknown>;
 
-export type PostData = MetaDate & {
-  content: string
-}
+export type PostMetadata = {
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  isPublished: boolean;
+  tags: string[];
+  version: number;
+  [key: string]: unknown;
+};
 
-export async function parseMarkdown(
-  rawContent: string,
-): Promise<Result<PostData, string>> {
+export type PostData = PostMetadata & {
+  content: string;
+};
+
+const isRecord = (value: unknown): value is FrontmatterData =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const getFrontmatterData = (rawContent: string) => {
+  const file = matter(rawContent);
+
+  return {
+    content: file.content,
+    data: isRecord(file.data) ? file.data : {},
+  };
+};
+
+const getString = (value: unknown) => (typeof value === 'string' ? value : undefined);
+
+const getBoolean = (value: unknown) => (typeof value === 'boolean' ? value : undefined);
+
+const getNumber = (value: unknown) => (typeof value === 'number' ? value : undefined);
+
+const getStringArray = (value: unknown) =>
+  Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+
+const getDateString = (value: unknown) => {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return value.toISOString();
+  }
+
+  return getString(value);
+};
+
+const normalizeMetadata = (data: FrontmatterData): PostMetadata => {
+  const now = new Date().toISOString();
+
+  return {
+    ...data,
+    title: getString(data.title) ?? 'Untitled',
+    createdAt: getDateString(data.createdAt) ?? now,
+    updatedAt: getDateString(data.updatedAt) ?? now,
+    isPublished: getBoolean(data.isPublished) ?? false,
+    tags: getStringArray(data.tags),
+    version: getNumber(data.version) ?? 1,
+  };
+};
+
+export async function parseMarkdown(rawContent: string): Promise<Result<PostData, string>> {
   try {
     if (!rawContent || rawContent.trim() === '') {
-      return err('Empty markdown content')
+      return err('Empty markdown content');
     }
 
-    const file = matter(rawContent)
-    const data = file.data as Record<string, any>
-
+    const file = getFrontmatterData(rawContent);
     const content = await unified()
       .use(remarkParse)
       .use(remarkRehype)
       .use(rehypeStringify)
-      .process(file.content)
+      .process(file.content);
+
     if (!content) {
-      return err('Failed to process markdown content')
+      return err('Failed to process markdown content');
     }
 
-    const postData: PostData = {
-      title: data.title ?? 'Untitled',
-      createdAt: data.createdAt ?? new Date().toISOString(),
-      updatedAt: data.updatedAt ?? new Date().toISOString(),
-      isPublished: data.isPublished ?? false,
-      tags: data.tags ?? [],
-      version: data.version ?? 1,
-      ...data,
+    return ok({
+      ...normalizeMetadata(file.data),
       content: content.toString(),
-    }
-
-    return ok(postData)
-  } catch (e) {
-    return err(e instanceof Error ? e.message : 'Unknown error')
+    });
+  } catch (error) {
+    return err(error instanceof Error ? error.message : 'Unknown error');
   }
 }
 
-export async function parseMetadata(
-  rawContent: string,
-): Promise<Result<MetaDate, string>> {
+export async function parseMetadata(rawContent: string): Promise<Result<PostMetadata, string>> {
   try {
     if (!rawContent || rawContent.trim() === '') {
-      return err('Empty markdown content')
+      return err('Empty markdown content');
     }
 
-    const file = matter(rawContent)
-    const data = file.data as Record<string, any>
+    const file = getFrontmatterData(rawContent);
 
-    const metadata: MetaDate = {
-      title: data.title ?? 'Untitled',
-      createdAt: data.createdAt ?? new Date().toISOString(),
-      updatedAt: data.updatedAt ?? new Date().toISOString(),
-      isPublished: data.isPublished ?? false,
-      tags: data.tags ?? [],
-      version: data.version ?? 1,
-      ...data,
-    }
-
-    return ok(metadata)
-  } catch (e) {
-    return err(e instanceof Error ? e.message : 'Unknown error')
+    return ok(normalizeMetadata(file.data));
+  } catch (error) {
+    return err(error instanceof Error ? error.message : 'Unknown error');
   }
 }
