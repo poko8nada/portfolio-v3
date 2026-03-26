@@ -19,7 +19,8 @@
     "sync:r2": "rclone sync r2:portfolio-bucket/ ./seeds/r2/ --progress --transfers=20 --exclude '.DS_Store'",
     "seed:r2:local": "pnpm run sync:r2 && node seeds/r2.mjs --local",
     "seed:r2:prod": "pnpm run sync:r2 && node seeds/r2.mjs --prod",
-    "seed:reset": "rm -rf .wrangler/state && pnpm run seed:r2:local"
+    "seed:reset": "rm -rf .wrangler/state && pnpm run seed:r2:local",
+    "prepare": "lefthook install && chmod +x .github/hooks/scripts/*.sh"
   },
   "dependencies": {
     "extend": "^3.0.2",

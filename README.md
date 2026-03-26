@@ -13,16 +13,20 @@ pnpm install
 ```bash
 pnpm run dev
 pnpm run test
+pnpm vitest run
 pnpm run typecheck
 pnpm run lint
+pnpm run lint:fix
 pnpm run format
+pnpm run format:check
 pnpm run build
 ```
 
 ## デプロイ
 
 ```bash
-pnpm run deploy
+pnpm run deploy:staging
+pnpm run deploy:prod
 ```
 
 ## R2 Seed
