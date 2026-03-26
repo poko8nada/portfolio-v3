@@ -13,7 +13,7 @@ pnpm install
 ```bash
 pnpm run dev
 pnpm run test
-pnpm vitest run
+pnpm run test:run
 pnpm run typecheck
 pnpm run lint
 pnpm run lint:fix

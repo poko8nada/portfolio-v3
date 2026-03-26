@@ -18,5 +18,5 @@ pre-push:
       fail_text: 'Type check failed. Run: pnpm tsc --noEmit for details.'
 
     test:
-      run: pnpm test
+      run: pnpm test:run
       fail_text: 'Tests failed. Fix all failing tests before pushing.'
