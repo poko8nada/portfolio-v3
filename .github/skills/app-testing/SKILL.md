@@ -1,44 +1,34 @@
 ---
 name: app-testing
-description: Core Skill. Minimal unit testing toolkit using Vitest for local web applications. Focuses on essential test coverage for critical functionality.
+description: >
+  Testing implementation guidance for this project.
+  Load when writing new tests, deciding what to test, setting up Vitest,
+  or implementing E2E tests with Playwright.
+  Covers unit testing with Vitest, component testing, integration testing,
+  and the decision tree for choosing the right approach.
 ---
 
 # Application Testing
 
-- Test business logic and critical functions only
-- When connecting to API, tests for both **normal and abnormal cases**
-- Skip UI components and trivial code
-- Place `*.test.ts(x)` adjacent to source files
-- Enable aliases using `vite-tsconfig-paths`
-
-**NOTE**:
-
-- Since Vitest depends on Vite via dependencies, there's no need to install Vite directly.
-- You can also write configuration files in `vitest.config.ts` instead of `vite.config.ts`.
-- It can be said that Vitest itself is designed to be usable without requiring much awareness of Vite's presence.
-
-## Decision Tree: Choosing Your Test Approach
+## Decision Tree
 
 ```
-User task → What needs testing?
-    ├─ Pure logic/utils → Unit test with Vitest (no browser needed)
-    │
-    ├─ Component rendering → Vitest + @testing-library/react (rarely needed)
-    │
-    └─ Full integration → Vitest + Playwright (rarely needed)
+What needs testing?
+├─ Pure logic / domain functions → Vitest unit test
+├─ Result<T,E> error paths → Vitest unit test (required for every error path)
+├─ API integration → Vitest + mock (success and failure cases both)
+├─ Component behavior → Vitest + @testing-library (use sparingly)
+└─ Critical user flows → Playwright E2E (use sparingly)
 ```
 
-## Vitest Unit Testing (Primary Approach)
-
-### Example: Minimal Essential Tests
+## Vitest Unit Tests
 
 ```typescript
-// math.test.ts
 import { describe, it, expect } from "vitest";
 import { calculateTotal } from "./math";
 
 describe("calculateTotal", () => {
-  it("handles empty cart", () => {
+  it("returns 0 for empty cart", () => {
     expect(calculateTotal([])).toBe(0);
   });
 
@@ -46,54 +36,41 @@ describe("calculateTotal", () => {
     expect(calculateTotal([{ price: 100 }], 0.1)).toBe(90);
   });
 
-  it("throws on negative prices", () => {
-    expect(() => calculateTotal([{ price: -10 }])).toThrow();
+  it("returns error Result when price is negative", () => {
+    const result = calculateTotal([{ price: -10 }]);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe("Invalid price");
   });
 });
 ```
 
-### Component Testing(rarely needed)
+## Component Tests (use sparingly)
 
 ```typescript
-// Button.test.tsx
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import { Button } from './Button'
+import { describe, it, expect, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { Button } from "./Button";
 
-describe('Button', () => {
-  it('calls onClick when clicked', () => {
-    const handleClick = vi.fn()
-    render(<Button onClick={handleClick}>Click</Button>)
-    screen.getByRole('button').click()
-    expect(handleClick).toHaveBeenCalledOnce()
-  })
+describe("Button", () => {
+  it("calls onClick when clicked", () => {
+    const handleClick = vi.fn();
+    render(<Button onClick={handleClick}>Click</Button>);
+    screen.getByRole("button").click();
+    expect(handleClick).toHaveBeenCalledOnce();
+  });
 
-  it('disables when loading', () => {
-    render(<Button loading>Click</Button>)
-    expect(screen.getByRole('button')).toBeDisabled()
-  })
-})
+  it("is disabled when loading", () => {
+    render(<Button loading>Click</Button>);
+    expect(screen.getByRole("button")).toBeDisabled();
+  });
+});
 ```
 
-## Running Tests
+## Playwright E2E (use sparingly)
 
-```bash
-# Run all tests
-pnpm run test
-
-# Watch mode during development
-pnpm run test -- --watch
-
-# Coverage report (optional)
-pnpm run test -- --coverage
-```
-
-## Integration Testing (When Necessary)
-
-For critical user flows that **must** work end-to-end using Playwright:
+For critical user flows that must work end-to-end:
 
 ```typescript
-// checkout.e2e.test.ts
 import { test, expect } from "@playwright/test";
 
 test("completes checkout flow", async ({ page }) => {
@@ -104,23 +81,18 @@ test("completes checkout flow", async ({ page }) => {
 });
 ```
 
-Run integration tests:
+## Running Tests
 
 ```bash
-pnpm run test:e2e
+pnpm test               # run all
+pnpm test -- --watch    # watch mode
+pnpm test -- --coverage
+pnpm test:e2e           # Playwright E2E
 ```
 
-## Best Practices
+## Rules
 
-- Test behavior, not implementation - Don't test internal state
-- One assertion per concept - Keep tests focused
-- Descriptive test names - "it('shows error when email invalid')"
-- Avoid test interdependence - Each test should run independently
-- Mock external dependencies - APIs, timers, file system
-
-## What **NOT** to Test
-
-- Framework internals (React, Vue rendering logic)
-- Third-party libraries (assume they work)
-- CSS/styling details
-- Trivial code (simple getters, obvious mappings)
+- Mock external dependencies (APIs, timers, file system)
+- No shared mutable state between tests
+- One assertion concept per test
+- Descriptive names: `"returns error when input is empty"` not `"test func1"`

@@ -25,7 +25,7 @@ const getRoutes = () => {
       })
       // Exclude dynamic routes (e.g. /posts/[slug]) and special files (e.g. /_app)
       .filter(p => !p.includes('/_') && !p.includes('/[') && p !== '/404')
-      .sort()
+      .toSorted()
   )
 }
 
@@ -75,7 +75,7 @@ export default createRoute(async c => {
   const routes = [
     ...getRoutes(),
     ...(await getPostRoutes(c.env.POSTS_BUCKET)),
-  ].sort()
+  ].toSorted()
   const origin = new URL(c.req.url).origin
   const xml = buildSitemapXml(origin, routes)
   return c.body(xml, 200, {

@@ -18,7 +18,7 @@
     "preToolUse": [
       {
         "type": "command",
-        "bash": ".github/hooks/notify-on-ask.sh",
+        "bash": "~/Desktop/main/life-work/00input-output/.github/hooks/scripts/notify-on-ask.sh",
         "timeoutSec": 10
       }
     ]

@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": ".github/hooks/scripts/pre-guard.sh",
+        "comment": "Block config file edits and --no-verify"
+      }
+    ],
+    "postToolUse": [
+      {
+        "type": "command",
+        "bash": ".github/hooks/scripts/post-lint.sh",
+        "comment": "Auto-fix with oxlint and oxfmt after file edits"
+      }
+    ]
+  }
+}

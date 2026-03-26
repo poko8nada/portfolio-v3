@@ -1,0 +1,22 @@
+---
+applyTo: "**/*.tsx,**/*.css"
+---
+
+# Frontend Rules
+
+## Tailwind CSS v4
+
+- No `tailwind.config.js` — all tokens defined in `@theme inline` in CSS only.
+- No `@apply` — use component extraction or direct utilities instead. `@apply` defeats the purpose of utility-first and creates hidden coupling.
+- Dark mode via CSS variables in `@theme`, not by duplicating color classes.
+
+## Components
+
+- One component per file.
+- Props type colocated: inline in the same file or in `[name].types.ts` alongside — never in a separate global types file.
+- Mobile-first responsive design using Tailwind breakpoint prefixes (`sm:`, `md:`, `lg:`).
+
+## Accessibility
+
+- Interactive elements must have accessible labels (`aria-label` or visible text).
+- Semantic elements always — no `div` for buttons or links.

@@ -37,7 +37,7 @@ export const PostList = async ({
 
   const sortedMetadataList = metadataList
     .filter(meta => meta.isPublished !== false)
-    .sort(
+    .toSorted(
       (a, b) =>
         new Date(b.updatedAt || b.createdAt).getTime() -
         new Date(a.updatedAt || a.createdAt).getTime(),
