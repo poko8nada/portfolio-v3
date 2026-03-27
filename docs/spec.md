@@ -1,5 +1,5 @@
 ---
-last-validated: 2026-03-26
+last-validated: 2026-03-27
 phase: current
 ---
 
@@ -186,6 +186,44 @@ phase: current
 ### Why Not
 
 - 画像を `public/` のみで配信する方式: 記事本文から参照する可変アセットを同じストレージ境界で扱えないため不採用。
+
+## コンテンツ同期運用
+
+### Requirements
+
+- [REQ-055] コンテンツ管理者は、公開記事と記事用アセットを `seeds/blogs`、about 用プロフィール資料を `seeds/resume-assets` のローカルディレクトリで正として管理できなければならない。
+- [REQ-056] コンテンツ管理者は、`blogs` と `resume-assets` のそれぞれについて、local `.wrangler/state` と production R2 への push を明示的なコマンドで実行できなければならない。
+- [REQ-057] コンテンツ管理者は、production R2 から `seeds/blogs` と `seeds/resume-assets` へ明示的な fetch を実行できなければならず、push コマンドは事前 fetch を暗黙実行してはならない。
+- [REQ-058] システムは、`blogs` と `resume-assets` の push/fetch で、存在しないファイルの削除を含む完全ミラーを収束結果として扱わなければならない。
+
+### Acceptance Criteria
+
+- [REQ-055] Given ローカルの blog コンテンツを編集する, When 管理対象ディレクトリを確認する, Then `posts/*.md` や `images/*` は `seeds/r2` ではなく `seeds/blogs` 配下に存在する。
+- [REQ-055] Given ローカルのプロフィール資料を編集する, When 管理対象ディレクトリを確認する, Then `resume/skills_20250728161256.md` を含む about 用ファイルは `seeds/resume-assets` 配下に存在する。
+- [REQ-056] Given `seeds/blogs` の内容を local preview 用 R2 へ反映したい, When `pnpm run push:blogs:local` を実行する, Then local `POSTS_BUCKET` の内容は `seeds/blogs` を基準に更新される。
+- [REQ-056] Given `seeds/blogs` の内容を production R2 へ反映したい, When `pnpm run push:blogs:prod` を実行する, Then `r2:portfolio-bucket/` は `seeds/blogs/` を基準に更新される。
+- [REQ-056] Given `seeds/resume-assets` の内容を local preview 用 R2 へ反映したい, When `pnpm run push:resume-assets:local` を実行する, Then local `RESUME_ASSETS_BUCKET` の内容は `seeds/resume-assets` を基準に更新される。
+- [REQ-056] Given `seeds/resume-assets` の内容を production R2 へ反映したい, When `pnpm run push:resume-assets:prod` を実行する, Then `r2:portfolio-resume-assets/` は `seeds/resume-assets/` を基準に更新される。
+- [REQ-056] Given blogs と resume-assets の両方を local preview 用 R2 へ反映したい, When `pnpm run push:content:local` を実行する, Then `push:blogs:local` と `push:resume-assets:local` の両方が実行される。
+- [REQ-056] Given blogs と resume-assets の両方を production R2 へ反映したい, When `pnpm run push:content:prod` を実行する, Then `push:blogs:prod` と `push:resume-assets:prod` の両方が実行される。
+- [REQ-057] Given production R2 の内容でローカルディレクトリを再取得したい, When `pnpm run fetch:blogs:prod` を実行する, Then `r2:portfolio-bucket/` の内容が `seeds/blogs/` に同期される。
+- [REQ-057] Given production R2 のプロフィール資料を再取得したい, When `pnpm run fetch:resume-assets:prod` を実行する, Then `r2:portfolio-resume-assets/` の内容が `seeds/resume-assets/` に同期される。
+- [REQ-057] Given production R2 の両方の内容をローカルへ再取得したい, When `pnpm run fetch:content:prod` を実行する, Then `fetch:blogs:prod` と `fetch:resume-assets:prod` の両方が実行される。
+- [REQ-057] Given `push:blogs:prod` または `push:resume-assets:prod` を実行する, When コマンドの責務を確認する, Then production R2 からローカルへの fetch は事前実行されない。
+- [REQ-058] Given production R2 側にローカルディレクトリに存在しないオブジェクトがある, When `push:blogs:prod` または `push:resume-assets:prod` を実行する, Then そのオブジェクトは削除され target は source の完全ミラーになる。
+- [REQ-058] Given local `.wrangler/state` 側にローカルディレクトリに存在しないオブジェクトがある, When `push:blogs:local` または `push:resume-assets:local` を実行する, Then そのオブジェクトは削除され target は source の完全ミラーになる。
+- [REQ-058] Given local `.wrangler/state` を空から再構築したい, When `pnpm run reset:content:local` を実行する, Then `.wrangler/state` が削除された上で `push:content:local` が再実行される。
+
+### Edge Cases
+
+- `fetch:*:prod` は bootstrap または recovery 用であり、通常の push フローの前提条件ではない。
+- `push:*:local` と `push:*:prod` は、対象ごとに `blogs` と `resume-assets` の責務を跨がない。
+- 完全ミラーには、source に存在しないファイルやオブジェクトの削除が含まれる。
+
+### Why Not
+
+- production R2 を唯一の正として毎回 fetch してから push する方式: ローカル編集結果が push コマンドの責務から見えづらくなり、差分確認と削除意図が曖昧になるため不採用。
+- `seed:r2:*` のように fetch と push を 1 コマンドへまとめる方式: 何をどこへ同期するかが名前から読めず、blogs と resume-assets の境界も崩れるため不採用。
 
 ## サイトマップとエラー応答
 

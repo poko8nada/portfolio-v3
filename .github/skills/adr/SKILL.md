@@ -91,7 +91,7 @@ Good examples:
 - `RESUME_ASSETS_BUCKET`
 - `portfolio-resume-assets`
 - `/about`
-- `resume/skills_20250728161256.md`
+- `resume/skill.md`
 
 Bad examples:
 

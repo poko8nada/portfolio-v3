@@ -20,6 +20,7 @@ export type AssetResult = {
 const R2_CACHE_NAME = 'r2-cache';
 const POST_CACHE_CONTROL = 'public, s-maxage=3600';
 const ASSET_CACHE_CONTROL = 'public, s-maxage=604800';
+export const ABOUT_RESUME_KEY = 'resume/skills_20250728161256.md';
 
 /**
  * Generate a consistent cache key for R2 objects.
@@ -56,20 +57,39 @@ export async function getPost(
   options?: CacheOptions,
 ): Promise<Result<PostResult, string>> {
   const key = `posts/${slug}.md`;
+  return getMarkdownDocument(bucket, key, `Post not found: ${slug}`, options);
+}
+
+export async function getAboutResume(
+  bucket: R2Bucket,
+  options?: CacheOptions,
+): Promise<Result<PostResult, string>> {
+  return getMarkdownDocument(
+    bucket,
+    ABOUT_RESUME_KEY,
+    `Resume markdown not found: ${ABOUT_RESUME_KEY}`,
+    options,
+  );
+}
+
+async function getMarkdownDocument(
+  bucket: R2Bucket,
+  key: string,
+  notFoundMessage: string,
+  options?: CacheOptions,
+): Promise<Result<PostResult, string>> {
   const cache = await caches.open(R2_CACHE_NAME);
   const cacheKey = options?.request ? getCacheKey(options.request, key) : null;
 
   const cachedResponse = await matchCache(cache, cacheKey);
   if (cachedResponse) {
-    // console.log(`[Cache HIT] post: ${slug}`)
     const content = await cachedResponse.text();
     return ok({ content, fromCache: true });
   }
 
   try {
-    // console.log(`[Cache MISS] Fetching post from R2: ${slug}`)
     const object = await bucket.get(key);
-    if (!object) return err(`Post not found: ${slug}`);
+    if (!object) return err(notFoundMessage);
     const content = await object.text();
 
     if (cacheKey && options?.ctx) {
@@ -83,8 +103,8 @@ export async function getPost(
     }
 
     return ok({ content, fromCache: false });
-  } catch (e) {
-    return err(e instanceof Error ? e.message : 'Unknown error');
+  } catch (error) {
+    return err(error instanceof Error ? error.message : 'Unknown error');
   }
 }
 
@@ -95,8 +115,8 @@ export async function listPosts(bucket: R2Bucket, limit = 100): Promise<Result<s
       .map((obj) => obj.key.replace('posts/', '').replace('.md', ''))
       .filter((slug) => slug !== '');
     return ok(slugs);
-  } catch (e) {
-    return err(e instanceof Error ? e.message : 'Unknown error');
+  } catch (error) {
+    return err(error instanceof Error ? error.message : 'Unknown error');
   }
 }
 
@@ -118,8 +138,8 @@ export async function getAllPosts(
       return ok(posts);
     }
     return err(listResult.error);
-  } catch (e) {
-    return err(e instanceof Error ? e.message : 'Unknown error');
+  } catch (error) {
+    return err(error instanceof Error ? error.message : 'Unknown error');
   }
 }
 
@@ -133,7 +153,6 @@ export async function getAsset(
 
   const cachedResponse = await matchCache(cache, cacheKey);
   if (cachedResponse?.body) {
-    // console.log(`[Cache HIT] path: ${path}`)
     return ok({
       body: cachedResponse.body,
       httpMetadata: {
@@ -145,7 +164,6 @@ export async function getAsset(
   }
 
   try {
-    // console.log(`[Cache MISS] Fetching from R2: ${path}`)
     const object = await bucket.get(path);
     if (!object) {
       return err(`Asset not found: ${path}`);
@@ -175,8 +193,7 @@ export async function getAsset(
       httpEtag: object.httpEtag,
       fromCache: false,
     });
-  } catch (e) {
-    // console.error('[R2 ERROR RAW]:', e)
-    return err(e instanceof Error ? e.message : 'Unknown error');
+  } catch (error) {
+    return err(error instanceof Error ? error.message : 'Unknown error');
   }
 }
