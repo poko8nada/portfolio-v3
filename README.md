@@ -29,12 +29,33 @@ pnpm run deploy:staging
 pnpm run deploy:prod
 ```
 
-## R2 Seed
+## Content Sync
+
+`pnpm run content` のみ。続けてサブコマンドを渡します（`--` の後が `node seeds/content-sync.mjs` に渡ります）。
 
 ```bash
-# local R2 (.wrangler/state)
-pnpm run seed:r2:local
+# 1) local preview 用 R2 state を更新（blogs と resume-assets の両方）
+pnpm run content -- push local
 
-# production R2 (Cloudflare remote bucket)
-pnpm run seed:r2:prod
+# 2) production R2 を更新（両方）
+pnpm run content -- push prod
+
+# 3) production からローカル source を再取得（復旧・初期化時、両方）
+pnpm run content -- fetch
+```
+
+`push` は `fetch` を暗黙実行しません。
+
+```bash
+# local R2 state を空から再構築してから push local（両方）
+pnpm run content -- reset-local
+
+pnpm run content -- help
+```
+
+単体だけ触りたいとき（第3引数は `blogs` / `resume` / `resume-assets`）:
+
+```bash
+pnpm run content -- push local blogs
+pnpm run content -- fetch resume
 ```
