@@ -45,7 +45,7 @@ export default createRoute(async (c) => {
       <meta property='og:description' content={description} />
       <meta name='twitter:title' content={title} />
       <meta name='twitter:description' content={description} />
-      <AboutDetail resumeTitle={parseResult.value.title} html={parseResult.value.content} />
+      <AboutDetail html={parseResult.value.content} />
     </div>,
   );
 });

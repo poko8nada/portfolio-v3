@@ -2,14 +2,13 @@ import React from 'hono/jsx';
 import { Section } from '../components/section';
 
 type AboutDetailProps = {
-  resumeTitle: string;
   html: string;
 };
 
-export const AboutDetail = ({ resumeTitle, html }: AboutDetailProps) => {
+export const AboutDetail = ({ html }: AboutDetailProps) => {
   return (
-    <Section heading='About'>
-      <p class='mb-6 text-sm text-text-secondary'>{resumeTitle}</p>
+    <Section>
+      <h2 class='mb-6 text-2xl text-text-primary'>Stacks</h2>
       <article class='prose max-w-none' dangerouslySetInnerHTML={{ __html: html }} />
     </Section>
   );

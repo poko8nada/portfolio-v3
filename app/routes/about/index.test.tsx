@@ -94,7 +94,7 @@ title: スキル
     expect(body).toContain('About | Poko Hanada');
     expect(body).toContain('スキル');
     expect(body).toContain('<h2>フレームワーク</h2>');
-    expect(resumeBucket.get).toHaveBeenCalledWith('resume/skills_20250728161256.md');
+    expect(resumeBucket.get).toHaveBeenCalledWith('resume/stack.md');
     expect(postsBucket.get).not.toHaveBeenCalled();
   });
 
@@ -116,7 +116,7 @@ title: スキル
 
     expect(response.status).toBe(500);
     expect(body).toContain('Error | Poko Hanada');
-    expect(body).toContain('Resume markdown not found: resume/skills_20250728161256.md');
+    expect(body).toContain('Resume markdown not found: resume/stack.md');
   });
 
   it('returns an error screen when markdown transformation fails', async () => {

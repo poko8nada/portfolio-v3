@@ -17,7 +17,8 @@
     "format:check": "oxfmt --check .",
     "typecheck": "tsc --noEmit",
     "content": "node seeds/content-sync.mjs",
-    "prepare": "lefthook install && chmod +x .github/hooks/scripts/*.sh"
+    "content:local": "pnpm run content -- push local",
+    "prepare": "lefthook install && chmod +x .cursor/hooks/*.sh"
   },
   "dependencies": {
     "extend": "^3.0.2",
@@ -25,6 +26,7 @@
     "hono": "^4.11.7",
     "honox": "0.1.52",
     "rehype-stringify": "^10.0.1",
+    "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
     "unified": "^11.0.5"

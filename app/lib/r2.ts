@@ -20,7 +20,7 @@ export type AssetResult = {
 const R2_CACHE_NAME = 'r2-cache';
 const POST_CACHE_CONTROL = 'public, s-maxage=3600';
 const ASSET_CACHE_CONTROL = 'public, s-maxage=604800';
-export const ABOUT_RESUME_KEY = 'resume/skills_20250728161256.md';
+export const ABOUT_RESUME_KEY = 'resume/stack.md';
 
 /**
  * Generate a consistent cache key for R2 objects.

@@ -1,5 +1,6 @@
 import { matter } from 'gray-matter-es';
 import rehypeStringify from 'rehype-stringify';
+import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { unified } from 'unified';
@@ -73,6 +74,7 @@ export async function parseMarkdown(rawContent: string): Promise<Result<PostData
     const file = getFrontmatterData(rawContent);
     const content = await unified()
       .use(remarkParse)
+      .use(remarkGfm)
       .use(remarkRehype)
       .use(rehypeStringify)
       .process(file.content);

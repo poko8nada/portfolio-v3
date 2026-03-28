@@ -65,6 +65,22 @@ This is a test post.`;
     }
   });
 
+  it('should render GFM tables', async () => {
+    const rawContent = `
+| Col A | Col B |
+| --- | --- |
+| x | y |
+`;
+    const result = await parseMarkdown(rawContent);
+
+    expect(isOk(result)).toBe(true);
+    if (isOk(result)) {
+      expect(result.value.content).toContain('<table>');
+      expect(result.value.content).toContain('<th');
+      expect(result.value.content).toContain('Col A');
+    }
+  });
+
   it('should return error when something goes wrong during parsing', async () => {
     // @ts-expect-error - simulating invalid input at runtime
     const result = await parseMarkdown(null);

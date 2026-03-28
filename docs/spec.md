@@ -64,29 +64,29 @@ phase: current
 
 - [REQ-015] 閲覧者は、`/about` で運営者のスキル詳細を Markdown 由来の HTML として閲覧できなければならない。
 - [REQ-016] システムは、`/about` 用コンテンツを `RESUME_ASSETS_BUCKET` にバインドされた R2 バケット `portfolio-resume-assets` から取得しなければならない。
-- [REQ-017] システムは、初版 `/about` の本文ソースとして `resume/skills_20250728161256.md` だけを読み出さなければならない。
+- [REQ-017] システムは、初版 `/about` の本文ソースとして `resume/stack.md` だけを読み出さなければならない。
 - [REQ-018] システムは、about ページ用 Markdown の取得または変換に失敗した場合、部分的に欠けた成功画面を返してはならない。
 
 ### Acceptance Criteria
 
-- [REQ-015] Given `/about`, When ページを表示する, Then `resume/skills_20250728161256.md` の Markdown から変換された HTML 本文が表示される。
+- [REQ-015] Given `/about`, When ページを表示する, Then `resume/stack.md` の Markdown から変換された HTML 本文が表示される。
 - [REQ-015] Given `/about`, When ページを表示する, Then ページタイトルは `About | Poko Hanada` になる。
 - [REQ-016] Given Workers 環境に `RESUME_ASSETS_BUCKET` が設定され、その実体が `portfolio-resume-assets` である, When `/about` を表示する, Then about コンテンツ取得は `POSTS_BUCKET` ではなく `RESUME_ASSETS_BUCKET` を使う。
-- [REQ-017] Given `RESUME_ASSETS_BUCKET` に `resume/skills_20250728161256.md` が存在する, When `/about` を表示する, Then そのオブジェクトだけが about 本文ソースとして使われる。
+- [REQ-017] Given `RESUME_ASSETS_BUCKET` に `resume/stack.md` が存在する, When `/about` を表示する, Then そのオブジェクトだけが about 本文ソースとして使われる。
 - [REQ-017] Given `RESUME_ASSETS_BUCKET` に他の Markdown が存在しても, When `/about` を表示する, Then それらは自動列挙や自動結合の対象にならない。
-- [REQ-018] Given `resume/skills_20250728161256.md` が取得できない, When `/about` を表示する, Then 一部欠けた本文ではなくエラー画面を返す。
-- [REQ-018] Given `resume/skills_20250728161256.md` の Markdown 変換に失敗する, When `/about` を表示する, Then 一部欠けた本文ではなくエラー画面を返す。
+- [REQ-018] Given `resume/stack.md` が取得できない, When `/about` を表示する, Then 一部欠けた本文ではなくエラー画面を返す。
+- [REQ-018] Given `resume/stack.md` の Markdown 変換に失敗する, When `/about` を表示する, Then 一部欠けた本文ではなくエラー画面を返す。
 
 ### Edge Cases
 
 - 初版 `/about` は 1 オブジェクト固定で、バケット列挙結果やファイル名ソート結果に依存しない。
-- `resume/skills_20250728161256.md` に frontmatter がなくても、Markdown 本文を HTML に変換して表示できれば要件を満たす。
+- `resume/stack.md` に frontmatter がなくても、Markdown 本文を HTML に変換して表示できれば要件を満たす。
 - 初版では複数ファイルの必須/任意判定を持ち込まない。
 
 ### Why Not
 
 - about 用 Markdown を `POSTS_BUCKET` に混在させる方式: 記事公開用コンテンツ契約とプロフィール資料の責務が混ざるため不採用。
-- 初版から複数 Markdown を列挙して組み立てる方式: 現時点で確定している入力は `resume/skills_20250728161256.md` のみで、未確定ルールを仕様へ持ち込みたくないため不採用。
+- 初版から複数 Markdown を列挙して組み立てる方式: 現時点で確定している入力は `resume/stack.md` のみで、未確定ルールを仕様へ持ち込みたくないため不採用。
 
 ## 記事一覧とタグ導線
 
@@ -199,7 +199,7 @@ phase: current
 ### Acceptance Criteria
 
 - [REQ-055] Given ローカルの blog コンテンツを編集する, When 管理対象ディレクトリを確認する, Then `posts/*.md` や `images/*` は `seeds/r2` ではなく `seeds/blogs` 配下に存在する。
-- [REQ-055] Given ローカルのプロフィール資料を編集する, When 管理対象ディレクトリを確認する, Then `resume/skills_20250728161256.md` を含む about 用ファイルは `seeds/resume-assets` 配下に存在する。
+- [REQ-055] Given ローカルのプロフィール資料を編集する, When 管理対象ディレクトリを確認する, Then `resume/stack.md` を含む about 用ファイルは `seeds/resume-assets` 配下に存在する。
 - [REQ-056] Given `seeds/blogs` の内容を local preview 用 R2 へ反映したい, When `pnpm run push:blogs:local` を実行する, Then local `POSTS_BUCKET` の内容は `seeds/blogs` を基準に更新される。
 - [REQ-056] Given `seeds/blogs` の内容を production R2 へ反映したい, When `pnpm run push:blogs:prod` を実行する, Then `r2:portfolio-bucket/` は `seeds/blogs/` を基準に更新される。
 - [REQ-056] Given `seeds/resume-assets` の内容を local preview 用 R2 へ反映したい, When `pnpm run push:resume-assets:local` を実行する, Then local `RESUME_ASSETS_BUCKET` の内容は `seeds/resume-assets` を基準に更新される。
