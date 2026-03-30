@@ -46,6 +46,8 @@ pnpm run content -- fetch
 
 `push` は `fetch` を暗黙実行しません。
 
+現行の `/about` は `resume-assets` をランタイムでは参照しません。`resume-assets` の同期は参考用プロフィール資料の保管用途であり、公開中の About ページを変更したい場合は `app/features/about-detail-data.ts` を更新します。
+
 ```bash
 # local R2 state を空から再構築してから push local（両方）
 pnpm run content -- reset-local

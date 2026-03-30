@@ -1,6 +1,6 @@
 ---
-status: Accepted
-date: 2026-03-27
+status: Superseded by ADR-0006
+date: 2026-03-30
 ---
 
 # ADR-0004: R2 配信コンテンツはローカル正の push/fetch ワークフローで同期する

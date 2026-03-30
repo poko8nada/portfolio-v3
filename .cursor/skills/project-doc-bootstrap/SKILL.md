@@ -1,6 +1,6 @@
 ---
 name: project-doc-bootstrap
-description: Bootstraps project documentation for an existing repository by reading the codebase, README, tests, and package metadata, then creates or updates docs/overview.md, docs/spec.md, and ADRs when significant architectural decisions are discovered. Use when asked to document a repo, extract project purpose, write overview/spec docs, review an existing codebase, or capture architecture decisions from source.
+description: Bootstraps project documentation for an existing repository by reading the codebase, README, tests, and package metadata, then creates or updates docs/overview.md, docs/behavior.md, and ADRs when significant architectural decisions are discovered. Use when asked to document a repo, extract project purpose, write overview/behavior docs, review an existing codebase, or capture architecture decisions from source.
 ---
 
 # Project Documentation Bootstrap
@@ -8,8 +8,8 @@ description: Bootstraps project documentation for an existing repository by read
 ## When to Use This Skill
 
 - The user wants to understand an existing repository and turn it into project docs
-- The user asks to create or update `docs/overview.md`, `docs/spec.md`, or `docs/adr/`
-- The user wants to document purpose, goals, constraints, requirements, and architectural decisions from source code
+- The user asks to create or update `docs/overview.md`, `docs/behavior.md`, or `docs/adr/`
+- The user wants to document purpose, goals, constraints, and architectural decisions from source code
 - The user mentions reverse engineering, repo audit, project read-through, or documentation bootstrapping
 
 ## Prerequisites
@@ -32,35 +32,35 @@ description: Bootstraps project documentation for an existing repository by read
    - Write the project purpose, goals, non-goals, constraints, and key decisions.
    - Keep only irreducible context that is difficult to infer from code alone.
 
-4. Produce `docs/spec.md` from observable behavior and intended requirements.
-    - Document functional requirements, acceptance criteria, edge cases, and external interfaces.
-    - Express requirements in a verifiable form and avoid implementation detail.
-    - If the repository already establishes exact values such as route paths, binding names,
-      environment variables, bucket names, object keys, or query parameters, write those exact values.
+4. Produce `docs/behavior.md` from observable behavior in the codebase.
+   - For each feature or page, judge whether tests are needed or self-evident from config/structure.
+   - Describe the happy path and failure path in rough terms — not exhaustive test cases.
+   - Code and tests are the source of truth; this document is supplementary.
+   - Do not document routing definitions or anything self-evident from the file structure.
 
 5. Create ADRs only when the repository contains a decision with lasting impact.
    - Use ADRs for non-obvious architecture choices, project-wide patterns, rejected alternatives, or external constraints.
+   - This is also the place for "why not" reasoning — alternatives that were considered and rejected.
    - Keep ADRs append-only and mark superseded decisions instead of rewriting history.
 
 6. Cross-check the generated docs against the repository.
-    - Do not invent missing facts.
-    - If the codebase does not support a claim, either omit it or flag it as an assumption for confirmation.
-    - Do not hide unknowns behind vague phrases like "専用バケット" or "適切なファイル".
+   - Do not invent missing facts.
+   - If the codebase does not support a claim, either omit it or flag it as an assumption for confirmation.
+   - Do not hide unknowns behind vague phrases like "専用バケット" or "適切なファイル".
 
 ## Output Expectations
 
 - Write the docs in Japanese
 - Keep `overview` focused on why the project exists
-- Keep `spec` focused on what the system must do
+- Keep `behavior` focused on what each feature does and whether it needs tests
 - Use ADRs only for decisions that need durable rationale
 - Aim for docs that a fresh agent can act on without relying on prior chat context
 
 ## Related Skills
 
 - `overview`
-- `spec`
+- `behavior`
 - `adr`
-- `coding-standards`
 
 ## Notes
 

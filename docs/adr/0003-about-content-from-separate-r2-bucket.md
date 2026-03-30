@@ -1,6 +1,6 @@
 ---
-status: Accepted
-date: 2026-03-26
+status: Superseded by ADR-0005
+date: 2026-03-30
 ---
 
 # ADR-0003: About 詳細ページは `RESUME_ASSETS_BUCKET` の特定 Markdown を表示する

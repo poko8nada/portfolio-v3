@@ -11,8 +11,8 @@ description: >
 
 ## Purpose of docs/overview.md
 
-This document captures the irreducible knowledge that cannot be derived from
-code, tests, or ADRs — the Why and Why Not behind the project's existence.
+Captures the irreducible knowledge that cannot be derived from code, tests, or ADRs —
+the why and why-not behind the project's existence.
 Agents use it to understand intent when making architectural decisions.
 
 ## What to write
@@ -30,13 +30,13 @@ Agents use it to understand intent when making architectural decisions.
 - How features work — that belongs in code and tests
 - Anything that will change as implementation evolves
 
-Do not use `overview` as a substitute for spec or ADR.
-If implementation requires exact values such as route names, binding names,
-object keys, or error policy, put those in `docs/spec.md` or `docs/adr/*.md`.
+Do not use `overview` as a substitute for `behavior` or ADR.
+Expected behavior per feature belongs in `docs/behavior.md`.
+Decision trade-offs and rejected alternatives belong in `docs/adr/*.md`.
 
 ## Format
 
-**This document should be written in Japanese.**
+**Write this document in Japanese.**
 
 ```markdown
 ---
@@ -44,32 +44,31 @@ last-validated: YYYY-MM-DD
 phase: current
 ---
 
-# [Project Name]
+# [プロジェクト名]
 
 ## Problem
 
-[1-3 sentences: what problem, for whom]
+[1〜3文：どんな問題を、誰のために解決するか]
 
 ## Goals
 
-- [Specific, measurable goal]
-- [Specific, measurable goal]
+- [具体的・測定可能なゴール]
 
 ## Non-goals
 
-- [What is out of scope and why]
+- [対象外にしていること、およびその理由]
 
 ## Constraints
 
-- [External constraint: legal, SLA, org policy, etc.]
+- [外部制約：法律・SLA・組織ポリシーなど]
 
 ## Tech Stack Rationale
 
-- [Choice]: [Why this over alternatives] → see ADR-NNNN
+- [選択したもの]：[なぜ他の選択肢でなくこれか] → see ADR-NNNN
 ```
 
 ## Maintenance rule
 
 Update `last-validated` whenever you verify the document still reflects reality.
 If any section no longer holds, update it or supersede with a new version.
-A stale `last-validated` is a signal the document may have rotted.
+A stale `last-validated` is a signal the document may have drifted.

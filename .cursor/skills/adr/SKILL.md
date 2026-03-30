@@ -12,12 +12,12 @@ description: >
 
 ## Purpose
 
-ADRs record the Why and Why Not behind significant decisions.
+ADRs record the why and why-not behind significant decisions.
 They are append-only — never rewrite, only supersede.
 Agents use status fields to determine which decisions are currently active.
 
-When an ADR fixes an architectural boundary, it must also record the concrete
-decision values that make implementation possible.
+This is also the canonical place for rejected alternatives — including
+feature-level "why not" reasoning that used to live in behavior documents.
 
 ## What qualifies as an ADR
 
@@ -25,7 +25,7 @@ decision values that make implementation possible.
 - Establishing a project-wide pattern (error handling, state management, etc.)
 - Rejecting a reasonable alternative that might be reconsidered later
 - Decisions driven by external constraints (legal, SLA, org policy)
-- Fixing concrete system boundaries such as route ownership, binding names,
+- Fixing concrete system boundaries: route ownership, binding names,
   storage locations, integration contracts, or failure policy
 
 ## What does NOT qualify
@@ -42,7 +42,7 @@ decision values that make implementation possible.
 
 ## Format
 
-**This document should be written in Japanese.**
+**Write this document in Japanese.**
 
 ```markdown
 ---
@@ -50,50 +50,46 @@ status: Accepted
 date: YYYY-MM-DD
 ---
 
-# ADR-NNNN: [Decision Title]
+# ADR-NNNN: [決定のタイトル]
 
 ## Context
 
-[What situation or problem prompted this decision?
-What constraints or forces were at play?]
+- [この決定を促した状況・問題は何か]
 
 ## Decision
 
-[What was decided? State it clearly and directly.]
+- [何を決定したか。明確・直接的に記述する]
 
 ## Rationale
 
-[Why this option over the alternatives?
-What trade-offs were accepted?]
+- [なぜこの選択肢か。どのトレードオフを受け入れたか]
 
 ## Alternatives Considered
 
-### [Alternative A]
+### [代替案 A]
 
-[What it is and why it was rejected]
+- [内容と、採用しなかった理由]
 
-### [Alternative B]
+### [代替案 B]
 
-[What it is and why it was rejected]
+- [内容と、採用しなかった理由]
 
 ## Consequences
 
-[What becomes easier or harder as a result of this decision?
-What future decisions does this constrain?]
+- [この決定によって何が楽になり、何が難しくなるか。将来の決定に何を制約するか]
 ```
 
 ## Concreteness rule
 
 If the ADR decides a concrete value, write the exact value.
 
-Good examples:
+Good:
 
 - `RESUME_ASSETS_BUCKET`
 - `portfolio-resume-assets`
 - `/about`
-- `resume/skill.md`
 
-Bad examples:
+Bad:
 
 - "専用バケット"
 - "skills 系の Markdown"
@@ -101,9 +97,7 @@ Bad examples:
 
 An ADR is not an implementation plan, but it must be specific enough that a
 fresh implementer understands the fixed boundary without additional chat.
-
-If the exact value is not yet known and implementation depends on it, ask the
-user before finalizing the ADR.
+If the exact value is not yet known and implementation depends on it, ask before finalizing.
 
 ## Naming convention
 
