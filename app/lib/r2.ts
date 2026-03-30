@@ -20,7 +20,6 @@ export type AssetResult = {
 const R2_CACHE_NAME = 'r2-cache';
 const POST_CACHE_CONTROL = 'public, s-maxage=3600';
 const ASSET_CACHE_CONTROL = 'public, s-maxage=604800';
-export const ABOUT_RESUME_KEY = 'resume/stack.md';
 
 /**
  * Generate a consistent cache key for R2 objects.
@@ -58,18 +57,6 @@ export async function getPost(
 ): Promise<Result<PostResult, string>> {
   const key = `posts/${slug}.md`;
   return getMarkdownDocument(bucket, key, `Post not found: ${slug}`, options);
-}
-
-export async function getAboutResume(
-  bucket: R2Bucket,
-  options?: CacheOptions,
-): Promise<Result<PostResult, string>> {
-  return getMarkdownDocument(
-    bucket,
-    ABOUT_RESUME_KEY,
-    `Resume markdown not found: ${ABOUT_RESUME_KEY}`,
-    options,
-  );
 }
 
 async function getMarkdownDocument(

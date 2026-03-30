@@ -1,36 +1,11 @@
 import React from 'hono/jsx';
 import { Hono } from 'hono';
-
 import { jsxRenderer } from 'hono/jsx-renderer';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import route from '.';
 
-const createMockCtx = (): ExecutionContext => ({
-  waitUntil: vi.fn(),
-  passThroughOnException: vi.fn(),
-  props: {},
-});
-
-const createMockBucket = (overrides: Partial<R2Bucket> = {}): R2Bucket => {
-  return {
-    get: vi.fn(),
-    list: vi.fn(),
-    put: vi.fn(),
-    delete: vi.fn(),
-    head: vi.fn(),
-    createMultipartUpload: vi.fn(),
-    resumeMultipartUpload: vi.fn(),
-    ...overrides,
-  } as unknown as R2Bucket;
-};
-
 const createTestApp = () => {
-  const app = new Hono<{
-    Bindings: {
-      POSTS_BUCKET: R2Bucket;
-      RESUME_ASSETS_BUCKET: R2Bucket;
-    };
-  }>();
+  const app = new Hono();
 
   app.use(
     '*',
@@ -46,101 +21,42 @@ const createTestApp = () => {
 };
 
 describe('/about route', () => {
-  const mockCache = {
-    match: vi.fn(),
-    put: vi.fn(),
-  };
-  const mockCacheStorage = {
-    open: vi.fn().mockResolvedValue(mockCache),
-  };
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.stubGlobal('caches', mockCacheStorage);
-  });
-
-  it('renders markdown from RESUME_ASSETS_BUCKET and does not touch POSTS_BUCKET', async () => {
-    const mockCtx = createMockCtx();
-    const postsBucket = createMockBucket();
-    const resumeBucket = createMockBucket({
-      get: vi.fn().mockResolvedValue({
-        text: () =>
-          Promise.resolve(`---
-title: スキル
----
-
-## フレームワーク
-
-- React`),
-      }),
-    });
-
-    mockCache.match.mockResolvedValue(null);
-
+  it('renders genre groups by default', async () => {
     const app = createTestApp();
-    const response = await app.fetch(
-      new Request('http://localhost/about'),
-      {
-        POSTS_BUCKET: postsBucket,
-        RESUME_ASSETS_BUCKET: resumeBucket,
-      },
-      mockCtx,
-    );
+    const response = await app.fetch(new Request('http://localhost/about'));
 
     const body = await response.text();
 
     expect(response.status).toBe(200);
-    expect(response.headers.get('X-Cache')).toBe('MISS');
     expect(body).toContain('About | Poko Hanada');
-    expect(body).toContain('スキル');
-    expect(body).toContain('<h2>フレームワーク</h2>');
-    expect(resumeBucket.get).toHaveBeenCalledWith('resume/stack.md');
-    expect(postsBucket.get).not.toHaveBeenCalled();
+    expect(body).toContain('ジャンル順');
+    expect(body).toContain('言語・マークアップ');
+    expect(body).toContain('フロントエンド');
+    expect(body).toContain('TypeScript / JavaScript');
   });
 
-  it('returns an error screen when the fixed markdown cannot be fetched', async () => {
-    const mockCtx = createMockCtx();
+  it('renders proficiency groups when requested', async () => {
     const app = createTestApp();
-    const response = await app.fetch(
-      new Request('http://localhost/about'),
-      {
-        POSTS_BUCKET: createMockBucket(),
-        RESUME_ASSETS_BUCKET: createMockBucket({
-          get: vi.fn().mockResolvedValue(null),
-        }),
-      },
-      mockCtx,
-    );
+    const response = await app.fetch(new Request('http://localhost/about?sort=proficiency'));
 
     const body = await response.text();
 
-    expect(response.status).toBe(500);
-    expect(body).toContain('Error | Poko Hanada');
-    expect(body).toContain('Resume markdown not found: resume/stack.md');
+    expect(response.status).toBe(200);
+    expect(body).toContain('習熟度順');
+    expect(body).toContain('Primary');
+    expect(body).toContain('Applied');
+    expect(body).toContain('Aware');
+    expect(body).toContain('HeroUI');
   });
 
-  it('returns an error screen when markdown transformation fails', async () => {
-    const mockCtx = createMockCtx();
-    mockCache.match.mockResolvedValue(null);
-
+  it('falls back to genre groups for an invalid sort value', async () => {
     const app = createTestApp();
-    const response = await app.fetch(
-      new Request('http://localhost/about'),
-      {
-        POSTS_BUCKET: createMockBucket(),
-        RESUME_ASSETS_BUCKET: createMockBucket({
-          get: vi.fn().mockResolvedValue({
-            text: () => Promise.resolve('   '),
-          }),
-        }),
-      },
-      mockCtx,
-    );
+    const response = await app.fetch(new Request('http://localhost/about?sort=invalid'));
 
     const body = await response.text();
 
-    expect(response.status).toBe(500);
-    expect(body).toContain('Error | Poko Hanada');
-    expect(body).toContain('Empty markdown content');
+    expect(response.status).toBe(200);
+    expect(body).toContain('言語・マークアップ');
+    expect(body).not.toContain('<h3>Primary</h3>');
   });
 });

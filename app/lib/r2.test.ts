@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { isErr, isOk } from '../utils/types';
-import { ABOUT_RESUME_KEY, getAboutResume, getAllPosts, getAsset, getPost, listPosts } from './r2';
+import { getAllPosts, getAsset, getPost, listPosts } from './r2';
 
 // R2Bucket のシンプルなモックを作成
 const createMockBucket = (overrides: Partial<R2Bucket> = {}): R2Bucket => {
@@ -115,48 +115,6 @@ describe('r2 client utility with cache', () => {
       expect(isErr(result)).toBe(true);
       if (isErr(result)) {
         expect(result.error).toBe('Post not found: missing');
-      }
-    });
-  });
-
-  describe('getAboutResume', () => {
-    it('should fetch the fixed about markdown key from R2', async () => {
-      const mockText = '# About Content';
-      const mockCtx = createMockCtx();
-      mockCache.match.mockResolvedValue(null);
-      const mockBucket = createMockBucket({
-        get: vi.fn().mockResolvedValue({
-          text: () => Promise.resolve(mockText),
-        }),
-      });
-
-      const result = await getAboutResume(mockBucket, {
-        request: mockRequest,
-        ctx: mockCtx,
-      });
-
-      expect(isOk(result)).toBe(true);
-      if (isOk(result)) {
-        expect(result.value.content).toBe(mockText);
-        expect(result.value.fromCache).toBe(false);
-      }
-      expect(mockBucket.get).toHaveBeenCalledWith(ABOUT_RESUME_KEY);
-      expect(mockCtx.waitUntil).toHaveBeenCalled();
-    });
-
-    it('should return an error when the fixed about markdown is missing', async () => {
-      mockCache.match.mockResolvedValue(null);
-      const mockBucket = createMockBucket({
-        get: vi.fn().mockResolvedValue(null),
-      });
-
-      const result = await getAboutResume(mockBucket, {
-        request: mockRequest,
-      });
-
-      expect(isErr(result)).toBe(true);
-      if (isErr(result)) {
-        expect(result.error).toBe(`Resume markdown not found: ${ABOUT_RESUME_KEY}`);
       }
     });
   });
