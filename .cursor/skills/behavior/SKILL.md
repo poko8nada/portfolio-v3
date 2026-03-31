@@ -21,6 +21,7 @@ Code and tests are the source of truth. This document supplements them.
 
 - Feature or page-level description of expected behavior
 - Test necessity judgment (and a brief reason if not needed)
+- If not needed, don't need to write anything else
 - Happy path: what input leads to what outcome
 - Failure path: what breaks and what should happen
 
@@ -45,8 +46,10 @@ last-validated: YYYY-MM-DD
 ## [Feature or Page Name]
 
 - **Tests needed**: yes / no (reason if no)
-- **Happy path**: [input] → [expected outcome]
-- **Failure path**: [failure condition] → [expected outcome]
+- **Happy path**:
+  - [input] → [expected outcome]
+- **Failure path**:
+  - [failure condition] → [expected outcome]
 ```
 
 ## Examples
@@ -55,8 +58,10 @@ last-validated: YYYY-MM-DD
 ## ユーザーログイン
 
 - **テスト要否**: 要
-- **正常系**: 正しい認証情報 → セッション発行・/dashboard へ遷移
-- **異常系**: 誤った認証情報 → エラーメッセージ表示・リダイレクトなし
+- **正常系**:
+  - 正しい認証情報 → セッション発行・/dashboard へ遷移
+- **異常系**:
+  - 誤った認証情報 → エラーメッセージ表示・リダイレクトなし
 
 ---
 
@@ -68,9 +73,12 @@ last-validated: YYYY-MM-DD
 
 ## データ取得 API（/api/items）
 
-**テスト要否**: 要
-**正常系**: 認証済みリクエスト → 200 + アイテム一覧
-**異常系**: 未認証 → 401 / DB接続失敗 → 500（ログにのみ記録、レスポンスには出さない）
+- **テスト要否**: 要
+- **正常系**:
+  - 認証済みリクエスト → 200 + アイテム一覧
+- **異常系**:
+  - 未認証 → 401
+  - DB接続失敗 → 500（ログにのみ記録、レスポンスには出さない）
 ```
 
 ## Maintenance rule
