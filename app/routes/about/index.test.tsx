@@ -29,9 +29,10 @@ describe('/about route', () => {
 
     expect(response.status).toBe(200);
     expect(body).toContain('About | Poko Hanada');
-    expect(body).toContain('ジャンル順');
+    expect(body).toContain('ジャンル');
+    expect(body).toContain('使用頻度');
+    expect(body).toContain('AI');
     expect(body).toContain('Markup');
-    expect(body).toContain('Frontend');
     expect(body).toContain('TypeScript / JavaScript');
   });
 
@@ -42,10 +43,10 @@ describe('/about route', () => {
     const body = await response.text();
 
     expect(response.status).toBe(200);
-    expect(body).toContain('習熟度順');
-    expect(body).toContain('Daily');
-    expect(body).toContain('Often');
-    expect(body).toContain('Sometimes');
+    expect(body).toContain('使用頻度');
+    expect(body).toContain('★★★ | Daily');
+    expect(body).toContain('☆★★ | Often');
+    expect(body).toContain('☆☆★ | Sometimes');
     expect(body).toContain('HeroUI');
   });
 
@@ -56,7 +57,10 @@ describe('/about route', () => {
     const body = await response.text();
 
     expect(response.status).toBe(200);
+    expect(body).toContain('AI');
     expect(body).toContain('Markup');
-    expect(body).not.toContain('<h3>Daily</h3>');
+    expect(body).not.toContain(
+      '<h3 class="mb-4 text-lg font-medium text-text-primary">★★★ | Daily</h3>',
+    );
   });
 });
