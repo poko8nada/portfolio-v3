@@ -7,21 +7,17 @@ type AboutDetailProps = {
 };
 
 const sortLinks: Array<{ mode: AboutSortMode; label: string; href: string }> = [
-  { mode: 'genre', label: 'ジャンル順', href: '/about?sort=genre' },
-  { mode: 'proficiency', label: '習熟度順', href: '/about?sort=proficiency' },
+  { mode: 'genre', label: 'ジャンル', href: '/about?sort=genre' },
+  { mode: 'frequency', label: '使用頻度', href: '/about?sort=frequency' },
 ];
 
 export const AboutDetail = ({ sort }: AboutDetailProps) => {
   const groups = groupAboutStacks(ABOUT_STACK_ITEMS, sort);
 
   return (
-    <Section>
-      <h2 class='mb-4 text-2xl text-text-primary'>Stacks</h2>
-      <p class='mb-8 text-sm text-text-secondary'>
-        ジャンルと習熟度の 2 つの軸で並び替えできます。
-      </p>
-
-      <div class='mb-10 flex flex-wrap items-center gap-3'>
+    <Section heading='Stacks'>
+      <p class='mb-4 text-sm text-text-secondary'>ジャンルと頻度で並べ替えができます</p>
+      <div class='mb-12 flex flex-wrap items-center gap-3'>
         {sortLinks.map((option) => {
           const isActive = option.mode === sort;
           return (
@@ -45,14 +41,22 @@ export const AboutDetail = ({ sort }: AboutDetailProps) => {
         {groups.map((group) => (
           <section key={group.label}>
             <h3 class='mb-4 text-lg font-medium text-text-primary'>{group.label}</h3>
-            <div class='flex flex-wrap gap-2'>
+            <div class='grid gap-3 grid-cols-1'>
               {group.items.map((item) => (
-                <span
+                <div
                   key={item.label}
-                  class='inline-flex rounded-full border border-border-primary px-3 py-1 text-sm text-text-secondary'
+                  class='flex justify-between align-middle w-full max-w-96 gap-1'
                 >
-                  {item.label}
-                </span>
+                  <span
+                    style={{ width: 'fit-content' }}
+                    class='rounded-full border border-border-primary px-3 py-1 text-sm text-text-secondary line-clamp-1'
+                  >
+                    {item.label}
+                  </span>
+                  <span class='w-36 p-1 text-sm text-text-secondary text-nowrap'>
+                    {sort === 'genre' ? item.frequency : item.genre}
+                  </span>
+                </div>
               ))}
             </div>
           </section>

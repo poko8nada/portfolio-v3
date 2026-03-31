@@ -58,7 +58,7 @@ export default createRoute((c) => {
         </div>
         <div class='mt-8'>
           <TextLink class='not-prose-a' href='/about'>
-            スキルセットを見る →
+            技術スタックを見る →
           </TextLink>
         </div>
       </Section>

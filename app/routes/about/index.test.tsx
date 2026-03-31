@@ -30,22 +30,22 @@ describe('/about route', () => {
     expect(response.status).toBe(200);
     expect(body).toContain('About | Poko Hanada');
     expect(body).toContain('ジャンル順');
-    expect(body).toContain('言語・マークアップ');
-    expect(body).toContain('フロントエンド');
+    expect(body).toContain('Markup');
+    expect(body).toContain('Frontend');
     expect(body).toContain('TypeScript / JavaScript');
   });
 
-  it('renders proficiency groups when requested', async () => {
+  it('renders frequency groups when requested', async () => {
     const app = createTestApp();
-    const response = await app.fetch(new Request('http://localhost/about?sort=proficiency'));
+    const response = await app.fetch(new Request('http://localhost/about?sort=frequency'));
 
     const body = await response.text();
 
     expect(response.status).toBe(200);
     expect(body).toContain('習熟度順');
-    expect(body).toContain('Primary');
-    expect(body).toContain('Applied');
-    expect(body).toContain('Aware');
+    expect(body).toContain('Daily');
+    expect(body).toContain('Often');
+    expect(body).toContain('Sometimes');
     expect(body).toContain('HeroUI');
   });
 
@@ -56,7 +56,7 @@ describe('/about route', () => {
     const body = await response.text();
 
     expect(response.status).toBe(200);
-    expect(body).toContain('言語・マークアップ');
-    expect(body).not.toContain('<h3>Primary</h3>');
+    expect(body).toContain('Markup');
+    expect(body).not.toContain('<h3>Daily</h3>');
   });
 });

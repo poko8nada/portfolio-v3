@@ -21,7 +21,7 @@ last-validated: 2026-03-31
 - **テスト要否**: 要
 - **正常系**:
   - `/about` または `/about?sort=genre` → ジャンル見出しごとにスタックを表示する
-  - `/about?sort=proficiency` → `Primary` / `Applied` / `Aware` の順で表示する
+  - `/about?sort=frequency` → `Daily` / `Often` / `Sometimes` の順で表示する
 - **異常系**:
   - `sort` が未指定または不正 → `genre` を既定値として扱い、R2 や Markdown 変換には依存せずページを表示する
 

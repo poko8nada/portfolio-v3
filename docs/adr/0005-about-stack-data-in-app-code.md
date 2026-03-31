@@ -9,15 +9,15 @@ date: 2026-03-28
 
 - `/about` の初版は `RESUME_ASSETS_BUCKET` から `resume/stack.md` を取得し、Markdown を HTML に変換して表示していました。
 - しかし今回の `/about` では、スタック項目を `ジャンル順` と `習熟度順` で切り替えて表示し、各項目を pill-shaped の簡易ラベルとして見せる必要があります。
-- この UI は、本文をそのまま表示するページではなく、各項目が少なくとも `label` `genre` `proficiency` を持つ構造化データを前提にします。
+- この UI は、本文をそのまま表示するページではなく、各項目が少なくとも `label` `genre` `frequency` を持つ構造化データを前提にします。
 - また、`/about` が外部 R2 オブジェクトの取得や Markdown 変換失敗に引きずられると、固定的なプロフィール情報を見せるページとしては故障点が増えます。
 
 ## Decision
 
 - `/about` の現行スタックデータの正本は、アプリケーションコード内に置きます。
-- 具体的には `app/features/about-detail-data.ts` に、少なくとも `label` `genre` `proficiency` を持つ配列を定義します。
+- 具体的には `app/features/about-detail-data.ts` に、少なくとも `label` `genre` `frequency` を持つ配列を定義します。
 - `/about` は `resume/stack.md` を実行時に取得せず、`RESUME_ASSETS_BUCKET` をランタイム入力として扱いません。
-- `/about` の並び替えモードは query parameter `sort` で表し、値は `genre` または `proficiency` に固定します。
+- `/about` の並び替えモードは query parameter `sort` で表し、値は `genre` または `frequency` に固定します。
 - `sort` が省略された場合、または不正な値だった場合は `genre` を既定値として扱います。
 
 ## Rationale
