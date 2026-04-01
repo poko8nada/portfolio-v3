@@ -1,5 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { ABOUT_STACK_ITEMS, groupAboutStacks, resolveAboutSortMode } from './about-detail-data';
+import { isErr, isOk } from '../utils/types';
+import {
+  groupAboutStacks,
+  parseAboutStackDocument,
+  resolveAboutSortMode,
+  type AboutStackItem,
+} from './about-detail-data';
+
+const ABOUT_STACK_ITEMS: AboutStackItem[] = [
+  { label: 'Cursor / CLI', genre: 'AI', frequency: '★★★ | Daily' },
+  { label: 'Github Copilot / CLI', genre: 'AI', frequency: '★★★ | Daily' },
+  { label: 'TypeScript / JavaScript', genre: 'Markup', frequency: '★★★ | Daily' },
+  { label: 'HTML5 / CSS3', genre: 'Markup', frequency: '★★★ | Daily' },
+  { label: 'React', genre: 'Frontend', frequency: '☆★★ | Often' },
+  { label: 'HeroUI', genre: 'Frontend', frequency: '☆☆★ | Sometimes' },
+];
 
 describe('about detail data', () => {
   it('falls back to genre sort when the query is missing or invalid', () => {
@@ -37,5 +52,41 @@ describe('about detail data', () => {
     ]);
     expect(groups[1]?.items.some((item) => item.label === 'React')).toBe(true);
     expect(groups[2]?.items.some((item) => item.label === 'HeroUI')).toBe(true);
+  });
+
+  it('parses a valid stack document', () => {
+    const result = parseAboutStackDocument(
+      JSON.stringify({
+        'last-updated': '2026-04-01',
+        stacks: ABOUT_STACK_ITEMS,
+      }),
+    );
+
+    expect(isOk(result)).toBe(true);
+    if (isOk(result)) {
+      expect(result.value).toEqual(ABOUT_STACK_ITEMS);
+    }
+  });
+
+  it('returns an error for an invalid stack document shape', () => {
+    const result = parseAboutStackDocument(
+      JSON.stringify({
+        stacks: [{ label: 'Cursor / CLI', genre: 'AI' }],
+      }),
+    );
+
+    expect(isErr(result)).toBe(true);
+    if (isErr(result)) {
+      expect(result.error).toBe('Invalid about stack item at index 0');
+    }
+  });
+
+  it('returns an error when the document is not valid json', () => {
+    const result = parseAboutStackDocument('{');
+
+    expect(isErr(result)).toBe(true);
+    if (isErr(result)) {
+      expect(result.error).toBeDefined();
+    }
   });
 });

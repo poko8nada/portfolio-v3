@@ -1,8 +1,9 @@
 import React from 'hono/jsx';
 import { Section } from '../components/section';
-import { ABOUT_STACK_ITEMS, type AboutSortMode, groupAboutStacks } from './about-detail-data';
+import { type AboutSortMode, type AboutStackItem, groupAboutStacks } from './about-detail-data';
 
 type AboutDetailProps = {
+  items: AboutStackItem[];
   sort: AboutSortMode;
 };
 
@@ -11,8 +12,8 @@ const sortLinks: Array<{ mode: AboutSortMode; label: string; href: string }> = [
   { mode: 'frequency', label: '使用頻度', href: '/about?sort=frequency' },
 ];
 
-export const AboutDetail = ({ sort }: AboutDetailProps) => {
-  const groups = groupAboutStacks(ABOUT_STACK_ITEMS, sort);
+export const AboutDetail = ({ items, sort }: AboutDetailProps) => {
+  const groups = groupAboutStacks(items, sort);
 
   return (
     <Section heading='About'>

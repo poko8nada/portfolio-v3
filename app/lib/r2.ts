@@ -5,10 +5,17 @@ export interface CacheOptions {
   request?: Request;
 }
 
-export type PostResult = {
+export interface DocumentOptions extends CacheOptions {
+  contentType?: string;
+  cacheControl?: string;
+}
+
+export type DocumentResult = {
   content: string;
   fromCache: boolean;
 };
+
+export type PostResult = DocumentResult;
 
 export type AssetResult = {
   body: ReadableStream;
@@ -18,7 +25,7 @@ export type AssetResult = {
 };
 
 const R2_CACHE_NAME = 'r2-cache';
-const POST_CACHE_CONTROL = 'public, s-maxage=3600';
+const DOCUMENT_CACHE_CONTROL = 'public, s-maxage=3600';
 const ASSET_CACHE_CONTROL = 'public, s-maxage=604800';
 
 /**
@@ -56,15 +63,19 @@ export async function getPost(
   options?: CacheOptions,
 ): Promise<Result<PostResult, string>> {
   const key = `posts/${slug}.md`;
-  return getMarkdownDocument(bucket, key, `Post not found: ${slug}`, options);
+  return getDocument(bucket, key, `Post not found: ${slug}`, {
+    ...options,
+    contentType: 'text/markdown; charset=utf-8',
+    cacheControl: DOCUMENT_CACHE_CONTROL,
+  });
 }
 
-async function getMarkdownDocument(
+export async function getDocument(
   bucket: R2Bucket,
   key: string,
   notFoundMessage: string,
-  options?: CacheOptions,
-): Promise<Result<PostResult, string>> {
+  options?: DocumentOptions,
+): Promise<Result<DocumentResult, string>> {
   const cache = await caches.open(R2_CACHE_NAME);
   const cacheKey = options?.request ? getCacheKey(options.request, key) : null;
 
@@ -82,8 +93,8 @@ async function getMarkdownDocument(
     if (cacheKey && options?.ctx) {
       const response = new Response(content, {
         headers: {
-          'Content-Type': 'text/markdown; charset=utf-8',
-          'Cache-Control': POST_CACHE_CONTROL,
+          'Content-Type': options.contentType ?? 'text/plain; charset=utf-8',
+          'Cache-Control': options.cacheControl ?? DOCUMENT_CACHE_CONTROL,
         },
       });
       persistCache(cache, cacheKey, options.ctx, response);

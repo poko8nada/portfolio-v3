@@ -1,12 +1,13 @@
+import { err, ok, type Result } from '../utils/types';
+
 export const ABOUT_SORT_MODES = ['genre', 'frequency'] as const;
 
 export type AboutSortMode = (typeof ABOUT_SORT_MODES)[number];
-export type AboutFrequency = '★★★ | Daily' | '☆★★ | Often' | '☆☆★ | Sometimes';
 
 export type AboutStackItem = {
   label: string;
   genre: string;
-  frequency: AboutFrequency;
+  frequency: string;
 };
 
 export type AboutStackGroup = {
@@ -14,50 +15,50 @@ export type AboutStackGroup = {
   items: AboutStackItem[];
 };
 
-export const ABOUT_STACK_ITEMS: AboutStackItem[] = [
-  { label: 'Cursor / CLI', genre: 'AI', frequency: '★★★ | Daily' },
-  { label: 'Github Copilot / CLI', genre: 'AI', frequency: '★★★ | Daily' },
-  { label: 'TypeScript / JavaScript', genre: 'Markup', frequency: '★★★ | Daily' },
-  { label: 'HTML5 / CSS3', genre: 'Markup', frequency: '★★★ | Daily' },
-  { label: 'Affinity', genre: 'Design/UI', frequency: '☆★★ | Often' },
-  { label: 'Figma', genre: 'Design/UI', frequency: '☆☆★ | Sometimes' },
-  { label: 'Pencil', genre: 'Design/UI', frequency: '☆☆★ | Sometimes' },
-  { label: 'React', genre: 'Frontend', frequency: '☆★★ | Often' },
-  { label: 'Next.js', genre: 'Frontend', frequency: '☆★★ | Often' },
-  { label: 'Honox', genre: 'Frontend', frequency: '☆★★ | Often' },
-  { label: 'Tailwind CSS', genre: 'Frontend', frequency: '★★★ | Daily' },
-  { label: 'shadcn/ui', genre: 'Frontend', frequency: '☆★★ | Often' },
-  { label: 'HeroUI', genre: 'Frontend', frequency: '☆☆★ | Sometimes' },
-  { label: 'Hono', genre: 'Backend/DB', frequency: '☆★★ | Often' },
-  { label: 'Node.js', genre: 'Backend/DB', frequency: '★★★ | Daily' },
-  { label: 'Drizzle ORM', genre: 'Backend/DB', frequency: '☆★★ | Often' },
-  { label: 'Turso', genre: 'Backend/DB', frequency: '☆☆★ | Sometimes' },
-  { label: 'Supabase', genre: 'Backend/DB', frequency: '☆☆★ | Sometimes' },
-  { label: 'Firestore / Mongo DB', genre: 'Backend/DB', frequency: '☆☆★ | Sometimes' },
-  { label: 'Cloudflare R2', genre: 'Backend/DB', frequency: '☆☆★ | Sometimes' },
-  { label: 'Cloudflare D1', genre: 'Backend/DB', frequency: '☆☆★ | Sometimes' },
-  { label: 'Vite', genre: 'Build/Quality', frequency: '★★★ | Daily' },
-  { label: 'Git / GitHub', genre: 'Build/Quality', frequency: '★★★ | Daily' },
-  { label: 'Biome', genre: 'Build/Quality', frequency: '☆★★ | Often' },
-  { label: 'Oxlint / Oxfmt', genre: 'Build/Quality', frequency: '☆★★ | Often' },
-  { label: 'Notion / Notion API', genre: 'Collabo/Docs', frequency: '☆★★ | Often' },
-  { label: 'Resend', genre: 'Collabo/Docs', frequency: '☆☆★ | Sometimes' },
-  { label: 'Cloudflare Workers', genre: 'Infra/Cloud', frequency: '★★★ | Daily' },
-  { label: 'Cloudflare Pages', genre: 'Infra/Cloud', frequency: '☆★★ | Often' },
-  { label: 'Cloudflare Turnstile', genre: 'Infra/Cloud', frequency: '☆☆★ | Sometimes' },
-  { label: 'Vercel / Netlify', genre: 'Infra/Cloud', frequency: '☆☆★ | Sometimes' },
-  { label: 'Google Cloud', genre: 'Infra/Cloud', frequency: '☆☆★ | Sometimes' },
-  { label: 'Docker', genre: 'Infra/Cloud', frequency: '☆☆★ | Sometimes' },
-  { label: 'Google Analytics 4', genre: 'Analysis', frequency: '☆★★ | Often' },
-  { label: 'Google Tag Manager', genre: 'Analysis', frequency: '☆★★ | Often' },
-  { label: 'MAツール', genre: 'Analysis', frequency: '☆★★ | Often' },
-];
-
-const ABOUT_PROFICIENCY_ORDER: AboutFrequency[] = ['★★★ | Daily', '☆★★ | Often', '☆☆★ | Sometimes'];
-const ABOUT_GENRE_ORDER = Array.from(new Set(ABOUT_STACK_ITEMS.map((item) => item.genre)));
+const ABOUT_PROFICIENCY_ORDER = ['★★★ | Daily', '☆★★ | Often', '☆☆★ | Sometimes'];
 
 export function resolveAboutSortMode(value: string | null | undefined): AboutSortMode {
   return value === 'frequency' ? 'frequency' : 'genre';
+}
+
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isAboutStackItem(value: unknown): value is AboutStackItem {
+  return (
+    isObjectRecord(value) &&
+    typeof value.label === 'string' &&
+    typeof value.genre === 'string' &&
+    typeof value.frequency === 'string'
+  );
+}
+
+export function parseAboutStackDocument(content: string): Result<AboutStackItem[], string> {
+  try {
+    const parsed: unknown = JSON.parse(content);
+    if (!isObjectRecord(parsed)) {
+      return err('Invalid about stack document');
+    }
+
+    const stacks = parsed.stacks;
+    if (!Array.isArray(stacks)) {
+      return err('Invalid about stack document');
+    }
+
+    const validatedItems: AboutStackItem[] = [];
+    for (const [index, item] of stacks.entries()) {
+      if (!isAboutStackItem(item)) {
+        return err(`Invalid about stack item at index ${index}`);
+      }
+
+      validatedItems.push(item);
+    }
+
+    return ok(validatedItems);
+  } catch (error) {
+    return err(error instanceof Error ? error.message : 'Unknown error');
+  }
 }
 
 export function groupAboutStacks(items: AboutStackItem[], sort: AboutSortMode): AboutStackGroup[] {
@@ -68,8 +69,12 @@ export function groupAboutStacks(items: AboutStackItem[], sort: AboutSortMode): 
     })).filter((group) => group.items.length > 0);
   }
 
-  return ABOUT_GENRE_ORDER.map((label) => ({
-    label,
-    items: items.filter((item) => item.genre === label),
-  })).filter((group) => group.items.length > 0);
+  const genreOrder = Array.from(new Set(items.map((item) => item.genre)));
+
+  return genreOrder
+    .map((label) => ({
+      label,
+      items: items.filter((item) => item.genre === label),
+    }))
+    .filter((group) => group.items.length > 0);
 }
