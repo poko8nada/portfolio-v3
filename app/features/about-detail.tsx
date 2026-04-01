@@ -15,8 +15,16 @@ export const AboutDetail = ({ sort }: AboutDetailProps) => {
   const groups = groupAboutStacks(ABOUT_STACK_ITEMS, sort);
 
   return (
-    <Section heading='Stacks'>
-      <p class='mb-4 text-sm text-text-secondary'>ジャンルと頻度で並べ替えができます</p>
+    <Section heading='About'>
+      <div class='mb-5 prose'>
+        <p>こんにちは。PokoHanadaです。</p>
+        <p>
+          Webディレクター・デベロッパー・エンジニア。
+          <br />
+          企画・設計から実装・運用まで一貫して担当いたします。
+        </p>
+        <p>技術スタックは「ジャンル」「使用頻度」で並べ替えできます</p>
+      </div>
       <div class='mb-12 flex flex-wrap items-center gap-3'>
         {sortLinks.map((option) => {
           const isActive = option.mode === sort;
@@ -27,7 +35,7 @@ export const AboutDetail = ({ sort }: AboutDetailProps) => {
               aria-current={isActive ? 'page' : undefined}
               class={`inline-flex rounded-full border px-3 py-1 text-sm transition-colors ${
                 isActive
-                  ? 'border-text-primary text-text-primary'
+                  ? 'border-text-primary text-text-primary pointer-events-none'
                   : 'border-border-primary text-text-secondary hover:text-text-primary'
               }`}
             >
