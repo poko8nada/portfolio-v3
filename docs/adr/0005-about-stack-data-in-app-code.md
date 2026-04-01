@@ -1,6 +1,6 @@
 ---
-status: Accepted
-date: 2026-03-28
+status: Superseded by ADR-0007
+date: 2026-04-01
 ---
 
 # ADR-0005: `/about` のスタックデータはアプリ内の構造化データを正本にする

@@ -35,6 +35,7 @@ lerna-debug.log*
 
 .playwright-cli
 
-seeds/resume-assets/resume/images/
-seeds/resume-assets/resume/career.md
-seeds/resume-assets/resume/resume.md
+seeds/**/career.md
+seeds/**/resume.md
+seeds/**/stack.md
+seeds/resume-assets/resume/*

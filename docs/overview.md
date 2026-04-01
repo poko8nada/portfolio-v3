@@ -1,5 +1,5 @@
 ---
-last-validated: 2026-03-30
+last-validated: 2026-04-01
 phase: current
 ---
 
@@ -29,7 +29,7 @@ phase: current
 - 実行基盤は Cloudflare Workers で、デプロイ設定は Wrangler で管理する。
 - 公開記事と記事用アセットは `POSTS_BUCKET` を通じて R2 から配信する。
 - 公開記事コンテンツの編集起点は `seeds/blogs` とする。
-- `seeds/resume-assets` は保持できるが、現行 `/about` のランタイム入力にはしない。
+- `seeds/resume-assets` のうち `resume/stack.json` は `/about` のランタイム入力として `RESUME_ASSETS_BUCKET` から配信する。
 - 本番環境は `pokohanada.com`、ステージング環境は `staging.pokohanada.com` のカスタムドメインを前提とする。
 - GTM は `GTM_CONTAINER_ID` が設定された場合のみ埋め込む。
 
@@ -38,5 +38,5 @@ phase: current
 - HonoX + Hono: Cloudflare Workers 上で JSX ベースの SSR を扱いやすくするため。 → see ADR-0001
 - Cloudflare R2 + Cache API: Markdown と画像アセットを軽量に配信しつつ、再読込時の応答性を確保するため。 → see ADR-0001
 - ローカルディレクトリ起点の content sync: Git とファイル差分を編集の正本として扱い、production R2 と local preview の同期責務を明確にするため。 → see ADR-0006
-- アプリ内の構造化データ: `/about` のスタック表示で安定した並び替えと型付けを保つため。 → see ADR-0005
+- R2 配信の構造化 JSON: `/about` のスタック表示で安定した並び替えとランタイム更新を両立するため。 → see ADR-0007
 - Tailwind CSS v4: 少ない UI コンポーネントでも一貫した見た目を維持しやすいため。

@@ -22,12 +22,13 @@ last-validated: 2026-04-01
 ## About 詳細ページ
 
 - **テストタイプ**: `feature`, `unit`
-- **テストファイル**: `app/routes/about/index.test.tsx`, `app/features/about-detail-data.test.ts`
+- **テストファイル**: `app/routes/about/index.test.tsx`, `app/features/about-detail-data.test.ts`, `app/lib/r2.test.ts`
 - **正常系**:
-  - `/about` または `/about?sort=genre` → ジャンル見出しごとにスタックを表示する
+  - `/about` または `/about?sort=genre` → `RESUME_ASSETS_BUCKET` の `resume/stack.json` を読み、ジャンル見出しごとにスタックを表示する
   - `/about?sort=frequency` → `Daily` / `Often` / `Sometimes` の順で表示する
 - **異常系**:
-  - `sort` が未指定または不正 → `genre` を既定値として扱い、R2 や Markdown 変換には依存せずページを表示する
+  - `sort` が未指定または不正 → `genre` を既定値として扱ってページを表示する
+  - `resume/stack.json` の取得に失敗、または JSON 形式が不正 → エラー画面を返す
 
 ## 記事一覧
 
