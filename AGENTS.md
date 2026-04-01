@@ -15,7 +15,7 @@ Rules are **What to do next** and **Why to do it** in this repo. Always follow f
 
 - Architecture decisions: `docs/adr/` (check status: Accepted / Superseded / Deprecated)
 - Project overview: `docs/overview.md`
-- Specification: `docs/spec.md`
+- Behavior expectations: `docs/behavior.md`
 - Task management: GitHub Issues via gh CLI — see `.cursor/skills/issue/SKILL.md`
 
 ## Prohibitions
@@ -30,7 +30,7 @@ Rules are **What to do next** and **Why to do it** in this repo. Always follow f
 Skills are a static "TYPES" for you. So that you just need to stick to them.
 
 - Project overview → `.cursor/skills/overview/SKILL.md`
-- Specification → `.cursor/skills/spec/SKILL.md`
+- Behavior documentation → `.cursor/skills/behavior/SKILL.md`
 - Architecture decision → `.cursor/skills/adr/SKILL.md`
 - Project documentation bootstrap → `.cursor/skills/project-doc-bootstrap/SKILL.md`
 - Issue management → `.cursor/skills/issue/SKILL.md`
@@ -38,3 +38,5 @@ Skills are a static "TYPES" for you. So that you just need to stick to them.
 - Coding standards → `.cursor/skills/coding-standards/SKILL.md`
 - Frontend design → `.cursor/skills/frontend-design/SKILL.md`
 - Testing → `.cursor/skills/app-testing/SKILL.md`
+- Library / framework docs → `.cursor/skills/context7-mcp/SKILL.md`
+- Agent memory → `.cursor/skills/agent-memory/SKILL.md`

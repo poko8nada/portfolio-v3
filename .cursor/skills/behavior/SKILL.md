@@ -3,7 +3,7 @@ name: behavior
 description: >
   Creates or updates docs/behavior.md — a lightweight summary of expected behavior
   per feature or page. Load when adding a new feature, clarifying intent of an
-  existing one, or deciding whether a feature needs tests at all.
+  existing one, or aligning behavior with test coverage.
   Assumes code and tests are the source of truth; this document is supplementary.
 ---
 
@@ -13,15 +13,31 @@ description: >
 
 Code and tests are the source of truth. This document supplements them.
 
-- Helps decide whether a feature needs tests at all
+- Helps connect behavior with existing or intended test coverage
 - Describes roughly what the happy path and failure path should look like
 - Does not aim to be exhaustive — if something is not written here, read the code
+
+## Relation to app-testing
+
+Use `.cursor/skills/app-testing/SKILL.md` when deciding which boundary should own
+the test and which test type fits best.
+
+Use this skill to record that decision in `docs/behavior.md` as:
+
+- expected behavior
+- chosen test type
+- current test file path, `未作成`, or `不要`
+
+`behavior` records the mapping.
+`app-testing` decides the testing strategy.
 
 ## What to write
 
 - Feature or page-level description of expected behavior
-- Test necessity judgment (and a brief reason if not needed)
-- If not needed, don't need to write anything else
+- One or more test types for that behavior, such as `unit`, `feature`, `component`, `e2e`
+- One or more test file paths if they exist, `未作成` if coverage is intended but not implemented yet, or `不要` if no test is needed
+- If the test file is `不要`, add a brief reason in `補足`
+- When the correct test type or ownership is unclear, consult `app-testing` before writing the entry
 - Happy path: what input leads to what outcome
 - Failure path: what breaks and what should happen
 
@@ -31,6 +47,7 @@ Code and tests are the source of truth. This document supplements them.
 - Exhaustive test cases — those belong in test files
 - Tech stack rationale — that belongs in ADRs
 - Things that are self-evident from config or routing structure
+- Fake or guessed test file paths
 
 ## Format
 
@@ -45,7 +62,9 @@ last-validated: YYYY-MM-DD
 
 ## [Feature or Page Name]
 
-- **Tests needed**: yes / no (reason if no)
+- **テストタイプ**: `unit` / `feature` / `component` / `e2e` / `不要` を 1 つ以上
+- **テストファイル**: `path/to/test-file` を 1 つ以上 / `未作成` / `不要`
+- **補足**: [required only when `テストファイル` is `不要`]
 - **Happy path**:
   - [input] → [expected outcome]
 - **Failure path**:
@@ -57,7 +76,8 @@ last-validated: YYYY-MM-DD
 ```markdown
 ## ユーザーログイン
 
-- **テスト要否**: 要
+- **テストタイプ**: `feature`
+- **テストファイル**: `app/routes/login/index.test.tsx`
 - **正常系**:
   - 正しい認証情報 → セッション発行・/dashboard へ遷移
 - **異常系**:
@@ -67,13 +87,16 @@ last-validated: YYYY-MM-DD
 
 ## ルーティング定義
 
-- **テスト要否**: 不要（next.config および app/ ディレクトリ構造で自明）
+- **テストタイプ**: 不要
+- **テストファイル**: 不要
+- **補足**: next.config および app/ ディレクトリ構造で自明
 
 ---
 
 ## データ取得 API（/api/items）
 
-- **テスト要否**: 要
+- **テストタイプ**: `feature`
+- **テストファイル**: `app/routes/api/items.test.ts`
 - **正常系**:
   - 認証済みリクエスト → 200 + アイテム一覧
 - **異常系**:

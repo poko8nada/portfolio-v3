@@ -7,6 +7,25 @@ description: >
 
 # Application Testing
 
+## Relation to docs/behavior.md
+
+`docs/behavior.md` is the lightweight map of expected behavior and current test
+coverage.
+
+Use `behavior` to record:
+
+- what the feature or page is expected to do
+- which test type covers it
+- which test file covers it, or whether it is `未作成` / `不要`
+
+Use this skill to decide:
+
+- which boundary owns the behavior
+- which test type is the best fit
+- whether a new test adds coverage or only duplicates an existing contract
+
+When behavior changes or test ownership changes, update `docs/behavior.md` too.
+
 ## Core Rule
 
 Test the boundary that owns the behavior.

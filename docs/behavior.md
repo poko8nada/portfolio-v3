@@ -1,16 +1,19 @@
 ---
-last-validated: 2026-03-31
+last-validated: 2026-04-01
 ---
 
 # Behavior
 
 ## 共通レイアウト
 
-- **テスト要否**: 不要（`_renderer.tsx` の条件分岐が小さく、canonical URL と GTM の埋め込み条件はコードから直接読み取れるため）
+- **テストタイプ**: 不要
+- **テストファイル**: 不要
+- **補足**: `_renderer.tsx` の条件分岐が小さく、canonical URL と GTM の埋め込み条件はコードから直接読み取れる
 
 ## トップページ
 
-- **テスト要否**: 要
+- **テストタイプ**: `feature`
+- **テストファイル**: 未作成
 - **正常系**:
   - `/` にアクセス → 自己紹介、外部リンク、`/about` への導線、最新 3 件の記事、制作物リンクを表示する
 - **異常系**:
@@ -18,7 +21,8 @@ last-validated: 2026-03-31
 
 ## About 詳細ページ
 
-- **テスト要否**: 要
+- **テストタイプ**: `feature`, `unit`
+- **テストファイル**: `app/routes/about/index.test.tsx`, `app/features/about-detail-data.test.ts`
 - **正常系**:
   - `/about` または `/about?sort=genre` → ジャンル見出しごとにスタックを表示する
   - `/about?sort=frequency` → `Daily` / `Often` / `Sometimes` の順で表示する
@@ -27,7 +31,8 @@ last-validated: 2026-03-31
 
 ## 記事一覧
 
-- **テスト要否**: 要
+- **テストタイプ**: `feature`
+- **テストファイル**: 未作成
 - **正常系**:
   - `/posts` → 公開済みかつメタデータを解釈できた記事を新しい順で表示する
   - `/posts?tag=<tag>` → そのタグを持つ記事だけを表示する
@@ -37,7 +42,8 @@ last-validated: 2026-03-31
 
 ## 記事詳細
 
-- **テスト要否**: 要
+- **テストタイプ**: `feature`
+- **テストファイル**: 未作成
 - **正常系**:
   - `/posts/<slug>` で公開済み記事が存在 → Markdown を表示し、OGP 用 meta、X 共有導線、関連記事 3 件を出す
 - **異常系**:
@@ -46,7 +52,8 @@ last-validated: 2026-03-31
 
 ## 画像アセット配信 API
 
-- **テスト要否**: 要
+- **テストタイプ**: `feature`
+- **テストファイル**: `app/routes/api/images/[path].test.ts`
 - **正常系**:
   - `/api/images/<path>` で既存アセットを要求 → `POSTS_BUCKET` から該当オブジェクトを返し、`Content-Type`、`ETag`、`Cache-Control`、`X-Cache` を付与する
 - **異常系**:
@@ -54,7 +61,8 @@ last-validated: 2026-03-31
 
 ## サイトマップ
 
-- **テスト要否**: 要
+- **テストタイプ**: `feature`
+- **テストファイル**: 未作成
 - **正常系**:
   - `/sitemap.xml` → API 以外の静的ルートと `POSTS_BUCKET` から列挙した記事 slug を使って XML を生成して返す
 - **異常系**:
