@@ -1,98 +1,116 @@
 ---
 name: app-testing
 description: >
-  Testing implementation guidance for this project.
-  Load when writing new tests, deciding what to test, setting up Vitest,
-  or implementing E2E tests with Playwright.
-  Covers unit testing with Vitest, component testing, integration testing,
-  and the decision tree for choosing the right approach.
+  Testing implementation guidance for application code. Load when deciding what
+  to test, how to split tests across layers, or how to avoid redundant tests.
 ---
 
 # Application Testing
 
+## Core Rule
+
+Test the boundary that owns the behavior.
+Do not duplicate the same contract across route, feature, and utility tests
+unless each layer truly owns a different risk.
+
 ## Decision Tree
 
-```
-What needs testing?
-├─ Pure logic / domain functions → Vitest unit test
-├─ Result<T,E> error paths → Vitest unit test (required for every error path)
-├─ API integration → Vitest + mock (success and failure cases both)
-├─ Component behavior → Vitest + @testing-library (use sparingly)
-└─ Critical user flows → Playwright E2E (use sparingly)
-```
-
-## Vitest Unit Tests
-
-```typescript
-import { describe, it, expect } from "vitest";
-import { calculateTotal } from "./math";
-
-describe("calculateTotal", () => {
-  it("returns 0 for empty cart", () => {
-    expect(calculateTotal([])).toBe(0);
-  });
-
-  it("applies discount correctly", () => {
-    expect(calculateTotal([{ price: 100 }], 0.1)).toBe(90);
-  });
-
-  it("returns error Result when price is negative", () => {
-    const result = calculateTotal([{ price: -10 }]);
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error).toBe("Invalid price");
-  });
-});
+```text
+What owns the behavior?
+├─ Shared pure logic or adapter → unit test
+├─ Feature-specific processing or rendering → feature test
+├─ Critical cross-page flow → E2E test
+└─ Small interactive UI detail only → component test
 ```
 
-## Component Tests (use sparingly)
+## Shared Logic and Adapter Tests
 
-```typescript
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { Button } from "./Button";
+Use unit tests for code that is reusable and framework-light.
 
-describe("Button", () => {
-  it("calls onClick when clicked", () => {
-    const handleClick = vi.fn();
-    render(<Button onClick={handleClick}>Click</Button>);
-    screen.getByRole("button").click();
-    expect(handleClick).toHaveBeenCalledOnce();
-  });
+Good fit:
 
-  it("is disabled when loading", () => {
-    render(<Button loading>Click</Button>);
-    expect(screen.getByRole("button")).toBeDisabled();
-  });
-});
-```
+- parsers
+- serializers
+- validators
+- API clients
+- storage adapters
+- cache helpers
+- normalization and transformation functions
 
-## Playwright E2E (use sparingly)
+These tests should verify:
 
-For critical user flows that must work end-to-end:
+- success behavior
+- every important failure path
+- edge cases
+- deterministic outputs
 
-```typescript
-import { test, expect } from "@playwright/test";
+## Feature Tests
 
-test("completes checkout flow", async ({ page }) => {
-  await page.goto("http://localhost:5173");
-  await page.getByRole("button", { name: "Add to Cart" }).click();
-  await page.getByRole("link", { name: "Checkout" }).click();
-  await expect(page.getByText("Order Complete")).toBeVisible();
-});
-```
+Use feature tests for behavior owned by one feature boundary.
 
-## Running Tests
+Good fit:
 
-```bash
-pnpm test               # run all
-pnpm test -- --watch    # watch mode
-pnpm test -- --coverage
-pnpm test:e2e           # Playwright E2E
-```
+- nested data loading or composition
+- feature-specific state transitions
+- feature-specific rendering decisions
+- feature-level error mapping
+- medium-sized feature-owned views
 
-## Rules
+Feature tests should receive explicit inputs whenever possible.
+Avoid making them depend on the full route or framework surface unless the
+feature truly owns that dependency.
 
-- Mock external dependencies (APIs, timers, file system)
-- No shared mutable state between tests
-- One assertion concept per test
-- Descriptive names: `"returns error when input is empty"` not `"test func1"`
+## Component Tests
+
+Use component tests sparingly.
+
+They are most useful when:
+
+- interaction cannot be expressed well at the feature level
+- accessibility behavior needs direct verification
+- a component has meaningful state transitions of its own
+
+Do not reach for component tests just because JSX exists.
+
+## E2E Tests
+
+Use E2E for critical user journeys that cross multiple boundaries.
+
+Good fit:
+
+- authentication flows
+- checkout flows
+- publishing flows
+- multi-step form submission
+
+Do not use E2E to cover behavior that is already well protected by feature tests unless the end-to-end risk is materially different.
+
+## Anti-Duplication Rules
+
+Before adding a test, ask:
+
+1. Which boundary owns this behavior?
+2. Is another test already asserting the same contract?
+3. Am I testing framework plumbing when a lower boundary already covers the logic?
+4. Am I testing nested logic from a route test when a feature test should own it?
+
+If the answer to the second question is yes, prefer deleting the weaker test
+instead of adding another.
+
+## Good Test Names
+
+Use names that describe the behavior and condition:
+
+- `returns not-found when the record does not exist`
+- `renders retry state when loading fails`
+- `redirects to login when the session is missing`
+
+Avoid names that only describe the function or file.
+
+## General Rules
+
+- mock external dependencies deliberately
+- keep tests independent
+- cover meaningful failure paths, not only happy paths
+- prefer one owned contract per test file
+- run the repository's existing validation commands before claiming completion
