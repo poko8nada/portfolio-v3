@@ -33,16 +33,19 @@ description: Bootstraps project documentation for an existing repository by read
    - Keep only irreducible context that is difficult to infer from code alone.
 
 4. Produce `docs/spec.md` from observable behavior and intended requirements.
-   - Document functional requirements, acceptance criteria, edge cases, and external interfaces.
-   - Express requirements in a verifiable form and avoid implementation detail.
+    - Document functional requirements, acceptance criteria, edge cases, and external interfaces.
+    - Express requirements in a verifiable form and avoid implementation detail.
+    - If the repository already establishes exact values such as route paths, binding names,
+      environment variables, bucket names, object keys, or query parameters, write those exact values.
 
 5. Create ADRs only when the repository contains a decision with lasting impact.
    - Use ADRs for non-obvious architecture choices, project-wide patterns, rejected alternatives, or external constraints.
    - Keep ADRs append-only and mark superseded decisions instead of rewriting history.
 
 6. Cross-check the generated docs against the repository.
-   - Do not invent missing facts.
-   - If the codebase does not support a claim, either omit it or flag it as an assumption for confirmation.
+    - Do not invent missing facts.
+    - If the codebase does not support a claim, either omit it or flag it as an assumption for confirmation.
+    - Do not hide unknowns behind vague phrases like "専用バケット" or "適切なファイル".
 
 ## Output Expectations
 
@@ -50,6 +53,7 @@ description: Bootstraps project documentation for an existing repository by read
 - Keep `overview` focused on why the project exists
 - Keep `spec` focused on what the system must do
 - Use ADRs only for decisions that need durable rationale
+- Aim for docs that a fresh agent can act on without relying on prior chat context
 
 ## Related Skills
 

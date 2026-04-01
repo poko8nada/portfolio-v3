@@ -37,8 +37,8 @@ export default createRoute((c) => {
       <meta name='twitter:title' content={title} />
       <meta name='twitter:description' content={description} />
 
-      <Section heading='About' id='about' class='prose'>
-        <div class='mb-10'>
+      <Section heading='About' id='about'>
+        <div class='mb-10 prose'>
           <p>こんにちは。PokoHanadaです。</p>
           <p>
             Webディレクター・デベロッパー・エンジニア。
@@ -56,6 +56,11 @@ export default createRoute((c) => {
             X/Twitter
           </Button>
         </div>
+        <div class='mt-8'>
+          <TextLink class='not-prose-a' href='/about'>
+            技術スタックを見る →
+          </TextLink>
+        </div>
       </Section>
       <Section heading='Posts' id='posts'>
         <PostList
@@ -64,7 +69,7 @@ export default createRoute((c) => {
           cacheOptions={{ ctx: c.executionCtx, request: c.req.raw }}
         />
         <div class='mt-10'>
-          <TextLink href='/posts'>すべての記事 →</TextLink>
+          <TextLink href='/posts'>すべての記事を読む →</TextLink>
         </div>
       </Section>
       <Section heading='Tools' id='tools'>

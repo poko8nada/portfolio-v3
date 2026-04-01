@@ -5,10 +5,17 @@ export interface CacheOptions {
   request?: Request;
 }
 
-export type PostResult = {
+export interface DocumentOptions extends CacheOptions {
+  contentType?: string;
+  cacheControl?: string;
+}
+
+export type DocumentResult = {
   content: string;
   fromCache: boolean;
 };
+
+export type PostResult = DocumentResult;
 
 export type AssetResult = {
   body: ReadableStream;
@@ -18,7 +25,7 @@ export type AssetResult = {
 };
 
 const R2_CACHE_NAME = 'r2-cache';
-const POST_CACHE_CONTROL = 'public, s-maxage=3600';
+const DOCUMENT_CACHE_CONTROL = 'public, s-maxage=3600';
 const ASSET_CACHE_CONTROL = 'public, s-maxage=604800';
 
 /**
@@ -56,35 +63,46 @@ export async function getPost(
   options?: CacheOptions,
 ): Promise<Result<PostResult, string>> {
   const key = `posts/${slug}.md`;
+  return getDocument(bucket, key, `Post not found: ${slug}`, {
+    ...options,
+    contentType: 'text/markdown; charset=utf-8',
+    cacheControl: DOCUMENT_CACHE_CONTROL,
+  });
+}
+
+export async function getDocument(
+  bucket: R2Bucket,
+  key: string,
+  notFoundMessage: string,
+  options?: DocumentOptions,
+): Promise<Result<DocumentResult, string>> {
   const cache = await caches.open(R2_CACHE_NAME);
   const cacheKey = options?.request ? getCacheKey(options.request, key) : null;
 
   const cachedResponse = await matchCache(cache, cacheKey);
   if (cachedResponse) {
-    // console.log(`[Cache HIT] post: ${slug}`)
     const content = await cachedResponse.text();
     return ok({ content, fromCache: true });
   }
 
   try {
-    // console.log(`[Cache MISS] Fetching post from R2: ${slug}`)
     const object = await bucket.get(key);
-    if (!object) return err(`Post not found: ${slug}`);
+    if (!object) return err(notFoundMessage);
     const content = await object.text();
 
     if (cacheKey && options?.ctx) {
       const response = new Response(content, {
         headers: {
-          'Content-Type': 'text/markdown; charset=utf-8',
-          'Cache-Control': POST_CACHE_CONTROL,
+          'Content-Type': options.contentType ?? 'text/plain; charset=utf-8',
+          'Cache-Control': options.cacheControl ?? DOCUMENT_CACHE_CONTROL,
         },
       });
       persistCache(cache, cacheKey, options.ctx, response);
     }
 
     return ok({ content, fromCache: false });
-  } catch (e) {
-    return err(e instanceof Error ? e.message : 'Unknown error');
+  } catch (error) {
+    return err(error instanceof Error ? error.message : 'Unknown error');
   }
 }
 
@@ -95,8 +113,8 @@ export async function listPosts(bucket: R2Bucket, limit = 100): Promise<Result<s
       .map((obj) => obj.key.replace('posts/', '').replace('.md', ''))
       .filter((slug) => slug !== '');
     return ok(slugs);
-  } catch (e) {
-    return err(e instanceof Error ? e.message : 'Unknown error');
+  } catch (error) {
+    return err(error instanceof Error ? error.message : 'Unknown error');
   }
 }
 
@@ -118,8 +136,8 @@ export async function getAllPosts(
       return ok(posts);
     }
     return err(listResult.error);
-  } catch (e) {
-    return err(e instanceof Error ? e.message : 'Unknown error');
+  } catch (error) {
+    return err(error instanceof Error ? error.message : 'Unknown error');
   }
 }
 
@@ -133,7 +151,6 @@ export async function getAsset(
 
   const cachedResponse = await matchCache(cache, cacheKey);
   if (cachedResponse?.body) {
-    // console.log(`[Cache HIT] path: ${path}`)
     return ok({
       body: cachedResponse.body,
       httpMetadata: {
@@ -145,7 +162,6 @@ export async function getAsset(
   }
 
   try {
-    // console.log(`[Cache MISS] Fetching from R2: ${path}`)
     const object = await bucket.get(path);
     if (!object) {
       return err(`Asset not found: ${path}`);
@@ -175,8 +191,7 @@ export async function getAsset(
       httpEtag: object.httpEtag,
       fromCache: false,
     });
-  } catch (e) {
-    // console.error('[R2 ERROR RAW]:', e)
-    return err(e instanceof Error ? e.message : 'Unknown error');
+  } catch (error) {
+    return err(error instanceof Error ? error.message : 'Unknown error');
   }
 }

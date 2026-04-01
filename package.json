@@ -4,11 +4,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "clean": "rm -rf .vite dist node_modules/.vite",
     "build": "vite build --mode client && vite build",
+    "rebuild": "pnpm run clean && pnpm run build",
     "dev:remote": "vite build && wrangler dev --remote",
     "preview": "wrangler dev",
-    "deploy:prod": "pnpm run build && wrangler deploy --env=production",
-    "deploy:staging": "pnpm run build && wrangler deploy --env=staging",
+    "deploy:prod": "pnpm run rebuild && wrangler deploy --env=production",
+    "deploy:staging": "pnpm run rebuild && wrangler deploy --env=staging",
     "test": "vitest",
     "test:run": "vitest run",
     "lint": "oxlint .",
@@ -16,12 +18,8 @@
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
     "typecheck": "tsc --noEmit",
-    "seed:r2": "pnpm run seed:r2:local",
-    "sync:r2": "rclone sync r2:portfolio-bucket/ ./seeds/r2/ --progress --transfers=20 --exclude '.DS_Store'",
-    "seed:r2:local": "pnpm run sync:r2 && node seeds/r2.mjs --local",
-    "seed:r2:prod": "pnpm run sync:r2 && node seeds/r2.mjs --prod",
-    "seed:reset": "rm -rf .wrangler/state && pnpm run seed:r2:local",
-    "prepare": "lefthook install && chmod +x .github/hooks/scripts/*.sh"
+    "content": "node seeds/content-sync.mjs",
+    "prepare": "lefthook install && chmod +x .cursor/hooks/*.sh"
   },
   "dependencies": {
     "extend": "^3.0.2",
@@ -29,6 +27,7 @@
     "hono": "^4.11.7",
     "honox": "0.1.52",
     "rehype-stringify": "^10.0.1",
+    "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
     "unified": "^11.0.5"

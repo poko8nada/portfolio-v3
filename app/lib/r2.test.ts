@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { isErr, isOk } from '../utils/types';
-import { getAllPosts, getAsset, getPost, listPosts } from './r2';
+import { getAllPosts, getAsset, getDocument, getPost, listPosts } from './r2';
 
 // R2Bucket のシンプルなモックを作成
 const createMockBucket = (overrides: Partial<R2Bucket> = {}): R2Bucket => {
@@ -115,6 +115,69 @@ describe('r2 client utility with cache', () => {
       expect(isErr(result)).toBe(true);
       if (isErr(result)) {
         expect(result.error).toBe('Post not found: missing');
+      }
+    });
+  });
+
+  describe('getDocument', () => {
+    it('should return document content from cache if available', async () => {
+      const mockCachedText = '{"stacks":[]}';
+      mockCache.match.mockResolvedValue(new Response(mockCachedText));
+      const mockBucket = createMockBucket();
+
+      const result = await getDocument(mockBucket, 'resume/stack.json', 'Document not found', {
+        request: mockRequest,
+        contentType: 'application/json; charset=utf-8',
+      });
+
+      expect(isOk(result)).toBe(true);
+      if (isOk(result)) {
+        expect(result.value.content).toBe(mockCachedText);
+        expect(result.value.fromCache).toBe(true);
+      }
+      expect(mockBucket.get).not.toHaveBeenCalled();
+    });
+
+    it('should fetch document content from R2 and save to cache on miss', async () => {
+      const mockText =
+        '{"stacks":[{"label":"Cursor / CLI","genre":"AI","frequency":"★★★ | Daily"}]}';
+      const mockCtx = createMockCtx();
+      mockCache.match.mockResolvedValue(null);
+      const mockBucket = createMockBucket({
+        get: vi.fn().mockResolvedValue({
+          text: () => Promise.resolve(mockText),
+        }),
+      });
+
+      const result = await getDocument(mockBucket, 'resume/stack.json', 'Document not found', {
+        request: mockRequest,
+        ctx: mockCtx,
+        contentType: 'application/json; charset=utf-8',
+      });
+
+      expect(isOk(result)).toBe(true);
+      if (isOk(result)) {
+        expect(result.value.content).toBe(mockText);
+        expect(result.value.fromCache).toBe(false);
+      }
+      expect(mockBucket.get).toHaveBeenCalledWith('resume/stack.json');
+      expect(mockCtx.waitUntil).toHaveBeenCalled();
+      expect(mockCache.put).toHaveBeenCalled();
+    });
+
+    it('should return error when document is not found in R2', async () => {
+      mockCache.match.mockResolvedValue(null);
+      const mockBucket = createMockBucket({
+        get: vi.fn().mockResolvedValue(null),
+      });
+
+      const result = await getDocument(mockBucket, 'resume/stack.json', 'Document not found', {
+        request: mockRequest,
+      });
+
+      expect(isErr(result)).toBe(true);
+      if (isErr(result)) {
+        expect(result.error).toBe('Document not found');
       }
     });
   });

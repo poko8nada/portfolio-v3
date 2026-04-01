@@ -18,6 +18,10 @@
           "binding": "POSTS_BUCKET",
           "bucket_name": "portfolio-bucket",
         },
+        {
+          "binding": "RESUME_ASSETS_BUCKET",
+          "bucket_name": "portfolio-resume-assets",
+        },
       ],
     },
     "staging": {
@@ -31,6 +35,10 @@
           "binding": "POSTS_BUCKET",
           "bucket_name": "portfolio-bucket",
         },
+        {
+          "binding": "RESUME_ASSETS_BUCKET",
+          "bucket_name": "portfolio-resume-assets",
+        },
       ],
     },
   },
@@ -38,6 +46,10 @@
     {
       "binding": "POSTS_BUCKET",
       "bucket_name": "portfolio-bucket",
+    },
+    {
+      "binding": "RESUME_ASSETS_BUCKET",
+      "bucket_name": "portfolio-resume-assets",
     },
   ],
   // "vars": {

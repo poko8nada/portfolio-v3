@@ -11,6 +11,8 @@
 
 ## Rules
 
+Rules are **What to do next** and **Why to do it** in this repo. Always follow first.
+
 - Architecture decisions: `docs/adr/` (check status: Accepted / Superseded / Deprecated)
 - Project overview: `docs/overview.md`
 - Specification: `docs/spec.md`
@@ -24,6 +26,8 @@
 - No explanatory comments — express intent through code and types
 
 ## Skills (load on demand)
+
+Skills are a static "TYPES" for you. So that you just need to stick to them.
 
 - Project overview → `.github/skills/overview/SKILL.md`
 - Specification → `.github/skills/spec/SKILL.md`

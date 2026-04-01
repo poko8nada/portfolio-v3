@@ -30,6 +30,10 @@ Agents use it to understand intent when making architectural decisions.
 - How features work — that belongs in code and tests
 - Anything that will change as implementation evolves
 
+Do not use `overview` as a substitute for spec or ADR.
+If implementation requires exact values such as route names, binding names,
+object keys, or error policy, put those in `docs/spec.md` or `docs/adr/*.md`.
+
 ## Format
 
 **This document should be written in Japanese.**
