@@ -16,6 +16,50 @@ export default jsxRenderer(({ children }, c) => {
   const canonicalUrl = c.req.url.replace(/\/$/, ''); // Remove trailing slash for canonical URL
   const path = c.req.path;
   const isPostPage = path.startsWith('/posts/') && path !== '/posts';
+  const isResumePage = path === '/resume';
+
+  if (isResumePage) {
+    return (
+      <html lang='ja'>
+        <head>
+          <meta charset='utf-8' />
+          <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+          <link rel='icon' href='/favicon.png' type='image/png' />
+          <link rel='canonical' href={canonicalUrl} />
+          <meta property='og:image:width' content='1200' />
+          <meta property='og:image:height' content='630' />
+          <meta property='og:type' content='website' />
+          <meta property='og:url' content={canonicalUrl} />
+          <meta name='twitter:card' content='summary_large_image' />
+          <meta name='twitter:url' content={canonicalUrl} />
+          {gtmContainerId ? (
+            <script
+              dangerouslySetInnerHTML={{
+                __html: gtmScript(gtmContainerId),
+              }}
+            />
+          ) : null}
+          <Link href='/app/style.css' rel='stylesheet' />
+          <Script src='/app/client.ts' async />
+        </head>
+        <body class='bg-white text-black antialiased'>
+          {gtmContainerId ? (
+            <noscript>
+              <iframe
+                src={`https://www.googletagmanager.com/ns.html?id=${gtmContainerId}`}
+                height='0'
+                width='0'
+                style={{ display: 'none', visibility: 'hidden' }}
+                sandbox='allow-scripts'
+                title='gtm'
+              />
+            </noscript>
+          ) : null}
+          <main class='min-h-screen'>{children}</main>
+        </body>
+      </html>
+    );
+  }
 
   return (
     <html lang='ja' class='scroll-smooth scroll-pt-36'>
