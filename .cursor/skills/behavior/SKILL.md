@@ -46,6 +46,7 @@ Use this skill to record that decision in `docs/behavior.md` as:
 - Implementation details — those belong in code
 - Exhaustive test cases — those belong in test files
 - Tech stack rationale — that belongs in ADRs
+- Exact runtime contracts, env names, object keys, or planned files — those belong in ADRs
 - Things that are self-evident from config or routing structure
 - Fake or guessed test file paths
 

@@ -14,6 +14,7 @@ description: >
 - 1 Issue = 1 PR — scope each issue to what can be completed in a single PR
 - Human decides whether to create. Agent handles creation, updates, and closing.
 - Issues are the session-to-session bridge — always reference the issue number in commits and PRs
+- If implementation depends on fixed contracts or planned files, create or update the ADR first and link it from the issue
 
 ## Granularity Guide
 
@@ -84,6 +85,7 @@ gh issue close [number] --comment "Resolved in PR #[pr-number]"
 
 - Related: #[issue-number]
 - ADR: docs/adr/NNNN-\*.md (if applicable)
+- Behavior: docs/behavior.md (if behavior mapping changed)
 ```
 
 ## Labels Convention

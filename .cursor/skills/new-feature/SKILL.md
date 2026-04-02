@@ -37,6 +37,14 @@ If the task depends on values such as:
 
 and those values are still vague, tighten the docs first.
 
+In this repository, tighten the ADR first.
+Do not create `docs/spec.md` unless the user explicitly asks for it.
+
+If implementation planning is part of the task, the ADR should also record:
+
+- a short implementation plan
+- the planned files and which boundary will own each one
+
 ## Delivery Order: Skeleton First
 
 Build in this order:
