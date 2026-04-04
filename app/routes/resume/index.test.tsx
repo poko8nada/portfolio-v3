@@ -10,6 +10,7 @@ const RESUME_DOCUMENT = JSON.stringify({
     nameKana: 'テスト タロウ',
     name: 'テスト 太郎',
     birthDay: '1990-01-01',
+    age: '36',
     gender: '男',
     cellPhone: '000',
     email: 't@example.com',
@@ -23,7 +24,14 @@ const RESUME_DOCUMENT = JSON.stringify({
   },
   education: [],
   experience: [],
-  licenses: [],
+  licenses: [{ year: '2006', month: '3', value: '普通自動車免許 取得' }],
+  awards: [{ year: '', month: '', value: 'なし' }],
+  supporting: {
+    dependents: '0',
+    spouse: '無',
+    supportingSpouse: '無',
+  },
+  extraSkills: [],
   motivation: '',
   request: '',
 });
@@ -149,5 +157,6 @@ describe('/resume route', () => {
     expect(response.status).toBe(200);
     expect(body).toContain('Resume | Poko Hanada');
     expect(body).toContain('data-resume-page-root');
+    expect(body).toContain('履歴書を表示する');
   });
 });

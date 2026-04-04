@@ -9,6 +9,7 @@ const MINIMAL_VALID = JSON.stringify({
     nameKana: 'テスト タロウ',
     name: 'テスト 太郎',
     birthDay: '1990-01-01',
+    age: '36',
     gender: '男',
     cellPhone: '000-0000-0000',
     email: 't@example.com',
@@ -23,6 +24,13 @@ const MINIMAL_VALID = JSON.stringify({
   education: [],
   experience: [],
   licenses: [],
+  awards: [],
+  supporting: {
+    dependents: '0',
+    spouse: '無',
+    supportingSpouse: '無',
+  },
+  extraSkills: [],
   motivation: '志望動機',
   request: '本人希望',
 });
@@ -41,7 +49,7 @@ describe('parseResumeDocument', () => {
     expect(isErr(result)).toBe(true);
   });
 
-  it('accepts a minimal valid document per ADR-0008', () => {
+  it('accepts a minimal valid document per ADR-0009', () => {
     const result = parseResumeDocument(MINIMAL_VALID);
     expect(isOk(result)).toBe(true);
     if (isOk(result)) {
@@ -58,6 +66,7 @@ describe('parseResumeDocument', () => {
         nameKana: 'テスト タロウ',
         name: 'テスト 太郎',
         birthDay: '1990-01-01',
+        age: '36',
         gender: '男',
         cellPhone: '000',
         // email omitted
@@ -72,6 +81,13 @@ describe('parseResumeDocument', () => {
       education: [],
       experience: [],
       licenses: [],
+      awards: [],
+      supporting: {
+        dependents: '0',
+        spouse: '無',
+        supportingSpouse: '無',
+      },
+      extraSkills: [],
       motivation: '',
       request: '',
     });
@@ -86,7 +102,7 @@ describe('parseResumeDocument', () => {
       expect(result.value.profile.name).toBe(resumeFixture.profile.name);
       expect(result.value.experience.length).toBeGreaterThan(0);
       const firstExp = result.value.experience[0];
-      expect(firstExp?.details?.length).toBeGreaterThan(0);
+      expect(firstExp?.detail?.length).toBeGreaterThan(0);
     }
   });
 
@@ -97,6 +113,7 @@ describe('parseResumeDocument', () => {
         nameKana: '',
         name: '',
         birthDay: '',
+        age: '',
         gender: '',
         cellPhone: '',
         email: '',
@@ -105,6 +122,13 @@ describe('parseResumeDocument', () => {
       education: [{ year: '2001', value: '卒業' }],
       experience: [],
       licenses: [],
+      awards: [],
+      supporting: {
+        dependents: '0',
+        spouse: '無',
+        supportingSpouse: '無',
+      },
+      extraSkills: [],
       motivation: '',
       request: '',
     });
@@ -119,6 +143,7 @@ describe('parseResumeDocument', () => {
         nameKana: '',
         name: '',
         birthDay: '',
+        age: '',
         gender: '',
         cellPhone: '',
         email: '',
@@ -128,6 +153,13 @@ describe('parseResumeDocument', () => {
       education: [],
       experience: [],
       licenses: [],
+      awards: [],
+      supporting: {
+        dependents: '0',
+        spouse: '無',
+        supportingSpouse: '無',
+      },
+      extraSkills: [],
       motivation: '',
       request: '',
     });

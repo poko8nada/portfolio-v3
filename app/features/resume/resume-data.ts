@@ -12,11 +12,11 @@ export type ResumeProfile = {
   nameKana: string;
   name: string;
   birthDay: string;
+  age: string;
   gender: string;
   cellPhone: string;
   email: string;
   photo?: ResumeProfilePhoto;
-  age?: string;
 };
 
 export type ResumeAddressBlock = {
@@ -24,7 +24,7 @@ export type ResumeAddressBlock = {
   kana: string;
   value: string;
   tel: string;
-  fax?: string;
+  fax: string;
 };
 
 export type ResumeAcademicBackground = {
@@ -42,9 +42,9 @@ export type ResumeTimelineEntry = {
 };
 
 export type ResumeSupporting = {
-  dependents?: string;
-  spouse?: string;
-  supportingSpouse?: string;
+  dependents: string;
+  spouse: string;
+  supportingSpouse: string;
 };
 
 function isObjectRecord(value: unknown): value is Record<string, unknown> {
@@ -70,6 +70,25 @@ export type ResumeData = {
   request: string;
 };
 
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === 'string');
+}
+
+function isPhoto(value: unknown): value is ResumeProfilePhoto {
+  return (
+    isObjectRecord(value) && typeof value.objectKey === 'string' && typeof value.alt === 'string'
+  );
+}
+
+function isSupporting(value: unknown): value is ResumeSupporting {
+  return (
+    isObjectRecord(value) &&
+    typeof value.dependents === 'string' &&
+    typeof value.spouse === 'string' &&
+    typeof value.supportingSpouse === 'string'
+  );
+}
+
 export function isTimeline(arr: ResumeTimelineEntry[]) {
   for (const item of arr) {
     if (
@@ -86,32 +105,57 @@ export function isTimeline(arr: ResumeTimelineEntry[]) {
 export function isResumeData(obj: Record<string, unknown>) {
   const data = obj as ResumeData;
   const isProfile =
-    typeof data.profile === 'object' &&
+    isObjectRecord(data.profile) &&
     typeof data.profile.date === 'string' &&
     typeof data.profile.nameKana === 'string' &&
     typeof data.profile.name === 'string' &&
     typeof data.profile.birthDay === 'string' &&
+    typeof data.profile.age === 'string' &&
     typeof data.profile.gender === 'string' &&
     typeof data.profile.cellPhone === 'string' &&
     typeof data.profile.email === 'string' &&
-    typeof data.profile.photo?.objectKey === 'string' &&
-    typeof data.profile.photo?.alt === 'string';
+    (data.profile.photo === undefined || isPhoto(data.profile.photo));
 
   const isAdress =
-    typeof data.address === 'object' &&
+    isObjectRecord(data.address) &&
     typeof data.address.zip === 'string' &&
     typeof data.address.kana === 'string' &&
     typeof data.address.value === 'string' &&
-    typeof data.address.tel === 'string';
+    typeof data.address.tel === 'string' &&
+    typeof data.address.fax === 'string';
+
+  const isContactAddress =
+    data.contactAddress === undefined ||
+    (isObjectRecord(data.contactAddress) &&
+      typeof data.contactAddress.zip === 'string' &&
+      typeof data.contactAddress.kana === 'string' &&
+      typeof data.contactAddress.value === 'string' &&
+      typeof data.contactAddress.tel === 'string' &&
+      typeof data.contactAddress.fax === 'string');
+
+  const isAcademicBackground =
+    data.academicBackground === undefined ||
+    (isObjectRecord(data.academicBackground) &&
+      typeof data.academicBackground.degree === 'string' &&
+      typeof data.academicBackground.degreeYear === 'string' &&
+      typeof data.academicBackground.degreeAffiliation === 'string' &&
+      typeof data.academicBackground.thesisTitle === 'string');
 
   return (
     isProfile &&
     isAdress &&
+    isContactAddress &&
+    isAcademicBackground &&
     isTimeline(data.education) &&
     isTimeline(data.experience) &&
     isTimeline(data.licenses) &&
     isTimeline(data.awards) &&
-    typeof data.supporting === 'object' &&
+    isSupporting(data.supporting) &&
+    (data.teaching === undefined || typeof data.teaching === 'string') &&
+    (data.affiliatedSociety === undefined || typeof data.affiliatedSociety === 'string') &&
+    (data.commutingTime === undefined || typeof data.commutingTime === 'string') &&
+    (data.hobby === undefined || typeof data.hobby === 'string') &&
+    (data.extraSkills === undefined || isStringArray(data.extraSkills)) &&
     typeof data.motivation === 'string' &&
     typeof data.request === 'string'
   );
@@ -128,12 +172,6 @@ export function parseResumeDocument(content: string): Result<ResumeData, string>
   if (!isObjectRecord(parsed)) {
     return err('Invalid resume document');
   }
-
-  // TODO(human):
-  // Validate `parsed` against the Runtime Contract in ADR-0008 (`docs/adr/0008-resume-page-from-r2-json-with-cloudflare-access.md`):
-  // required top-level keys, required `profile` and `address` fields, timeline arrays whose items each have `year`, `month`, `value`, optional `details` on `experience`, optional `photo` with `objectKey` + `alt`, and string fields for free-text sections.
-  // Hint: Reuse narrowing patterns from `app/features/about-detail-data.ts` (`parseAboutStackDocument`, lines 24–62). For arrays, validate each index and return `err(\`… at index ${index}\`)` on failure.
-  // Reference seed: `seeds/resume-assets/resume/resume.json`
 
   if (isResumeData(parsed)) {
     return ok(parsed as ResumeData);

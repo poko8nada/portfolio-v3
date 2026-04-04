@@ -3,6 +3,7 @@ import { createRoute } from 'honox/factory';
 import { Resume, parseResumeDocument, RESUME_JSON_OBJECT_KEY } from '../../features/resume';
 import { getDocument } from '../../lib/r2';
 import { isErr } from '../../utils/types';
+import ResumeOvarlay from '../../islands/resume-overlay';
 
 export default createRoute(async (c) => {
   const title = 'Resume | Poko Hanada';
@@ -40,13 +41,14 @@ export default createRoute(async (c) => {
   c.header('X-Cache', getResult.value.fromCache ? 'HIT' : 'MISS');
 
   return c.render(
-    <div>
+    <div class={'min-h-screen relative'}>
       <title>{title}</title>
       <meta name='description' content={description} />
       <meta property='og:title' content={title} />
       <meta property='og:description' content={description} />
       <meta name='twitter:title' content={title} />
       <meta name='twitter:description' content={description} />
+      <ResumeOvarlay />
       <Resume data={parseResult.value} />
     </div>,
   );
