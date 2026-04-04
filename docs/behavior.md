@@ -1,5 +1,5 @@
 ---
-last-validated: 2026-04-01
+last-validated: 2026-04-04
 ---
 
 # Behavior
@@ -33,15 +33,17 @@ last-validated: 2026-04-01
 ## Resume ページ
 
 - **テストタイプ**: `feature`, `unit`
-- **テストファイル**: 未作成
-- **補足**: 閲覧制限は Cloudflare Access（Zero Trust）で行い、未認証・未許可のトラフィックは Workers に到達する前にブロックまたはログインへ誘導される。アプリは HTTP Basic 認証を行わない。
+- **テストファイル**: `app/routes/resume/index.test.tsx`, `app/features/resume/resume-data.test.ts`
+- **補足**: 閲覧制限は Cloudflare Access（Zero Trust）で行い、未認証・未許可のトラフィックは Workers に到達する前にブロックまたはログインへ誘導される。path 単位で運用する場合は `/resume` と `/api/resume-assets/*` を同じ保護対象に含める。アプリは HTTP Basic 認証を行わない。
 - **正常系**:
   - Cloudflare Access を通過した状態で `/resume` にアクセス → `RESUME_ASSETS_BUCKET` の `resume/resume.json` を読み、日本の一般的な履歴書として白背景・黒文字で表示する
+  - 初期表示 → ページ全体に privacy overlay を出し、明示ボタンから browser 標準 confirm を通過したときだけ本文を表示する
+  - reveal 後に同一ブラウザ session で再表示 → `sessionStorage` に保存した状態を使って本文表示を維持する
   - ブラウザ印刷 → A4 縦 1 ページずつ自然に改ページされ、2 ページを並べて A3 横見開き相当として扱いやすいレイアウトになる
-  - 写真領域を hover → ピル型ボタンを表示し、click 後に実画像へ切り替える
 - **異常系**:
   - `resume/resume.json` の取得に失敗、または JSON 形式が不正 → エラー画面を返す
   - 写真アセットが未設定、または取得に失敗 → ダミー表示を維持し、ページ全体は表示を続ける
+  - overlay を解除しないまま印刷 → 非表示のままの状態をそのまま印刷する
 
 ## 記事一覧
 
@@ -70,6 +72,15 @@ last-validated: 2026-04-01
 - **テストファイル**: `app/routes/api/images/[path].test.ts`
 - **正常系**:
   - `/api/images/<path>` で既存アセットを要求 → `POSTS_BUCKET` から該当オブジェクトを返し、`Content-Type`、`ETag`、`Cache-Control`、`X-Cache` を付与する
+- **異常系**:
+  - オブジェクト不存在または取得失敗 → 404 を返す
+
+## 履歴書アセット配信 API
+
+- **テストタイプ**: `feature`
+- **テストファイル**: 未作成
+- **正常系**:
+  - `/api/resume-assets/<path>` で既存アセットを要求 → `RESUME_ASSETS_BUCKET` から該当オブジェクトを返し、`Content-Type`、`ETag`、`Cache-Control`、`X-Cache` を付与する
 - **異常系**:
   - オブジェクト不存在または取得失敗 → 404 を返す
 

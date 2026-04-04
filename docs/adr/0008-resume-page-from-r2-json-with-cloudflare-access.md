@@ -1,6 +1,6 @@
 ---
-status: Accepted
-date: 2026-04-01
+status: Superseded by ADR-0009
+date: 2026-04-04
 ---
 
 # ADR-0008: `/resume` は `RESUME_ASSETS_BUCKET` の JSON を Cloudflare Access 越しに表示する
