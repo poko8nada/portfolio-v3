@@ -115,7 +115,7 @@ export function Resume(props: { data: ResumeData }) {
           </div>
           <TimelineSeparator value='' />
           <TimelineSeparator value='賞　罰' />
-          <TimelineBox text={awards[0].value} />
+          {awards.length > 0 && <TimelineBox text={awards[0].value} />}
           <TimelineSeparator value='' />
           <div class={'grid grid-cols-12 border border-t-0'}>
             <div class={'text-sm text-center col-span-1 border-r border-dashed'}>年</div>
