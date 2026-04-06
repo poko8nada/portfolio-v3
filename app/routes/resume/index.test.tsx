@@ -157,6 +157,8 @@ describe('/resume route', () => {
     expect(response.status).toBe(200);
     expect(body).toContain('Resume | Poko Hanada');
     expect(body).toContain('data-resume-page-root');
-    expect(body).toContain('履歴書を表示する');
+    expect(body).toContain('id="resume-content"');
+    expect(body).toContain('hidden=""');
+    expect(body).toContain('上記をご確認ください');
   });
 });
