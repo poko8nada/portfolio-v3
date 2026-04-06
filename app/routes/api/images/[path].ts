@@ -1,4 +1,5 @@
 import { createRoute } from 'honox/factory';
+import { resolveContentType } from '../../../lib/content-type';
 import { getAsset } from '../../../lib/r2';
 import { isErr } from '../../../utils/types';
 
@@ -26,13 +27,14 @@ export default createRoute(async (c) => {
   }
 
   const { body, httpMetadata, httpEtag, fromCache } = result.value;
+  const contentType = resolveContentType(path, httpMetadata?.contentType);
 
   // Set X-Cache header to indicate cache status
   c.header('X-Cache', fromCache ? 'HIT' : 'MISS');
 
   // Set appropriate headers for the response
-  if (httpMetadata?.contentType) {
-    c.header('Content-Type', httpMetadata.contentType);
+  if (contentType) {
+    c.header('Content-Type', contentType);
   }
   if (httpEtag) {
     c.header('ETag', httpEtag);

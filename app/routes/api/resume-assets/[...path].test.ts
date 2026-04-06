@@ -101,6 +101,23 @@ describe('API /api/resume-assets/* route', () => {
     expect(mockBucket.get).toHaveBeenCalledWith('resume/profile/profile image.png');
   });
 
+  it('infers image content type from extension when metadata is missing', async () => {
+    const mockCtx = createMockCtx();
+    const mockBucket = createMockBucket({
+      get: vi.fn().mockResolvedValue({
+        body: new ReadableStream(),
+      }),
+    });
+    mockCache.match.mockResolvedValue(null);
+
+    const app = createTestApp();
+    const req = new Request('http://localhost/api/resume-assets/resume/images/profile.jpg');
+    const res = await app.fetch(req, { RESUME_ASSETS_BUCKET: mockBucket }, mockCtx);
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get('Content-Type')).toBe('image/jpeg');
+  });
+
   it('returns 404 when asset is missing', async () => {
     const mockCtx = createMockCtx();
     const mockBucket = createMockBucket({

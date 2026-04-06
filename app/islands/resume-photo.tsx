@@ -14,6 +14,7 @@ const buildResumeAssetPath = (objectKey: string) =>
 
 export default function ResumePhoto({ alt, name, objectKey }: ResumePhotoProps) {
   const [hasError, setHasError] = useState(false);
+  const src = objectKey ? buildResumeAssetPath(objectKey) : '';
 
   if (!objectKey || hasError) {
     return (
@@ -35,7 +36,7 @@ export default function ResumePhoto({ alt, name, objectKey }: ResumePhotoProps) 
       onError={() => {
         setHasError(true);
       }}
-      src={buildResumeAssetPath(objectKey)}
+      src={src}
     />
   );
 }

@@ -94,6 +94,24 @@ describe('API [...path] route with cache', () => {
       expect(mockBucket.get).not.toHaveBeenCalled();
     });
 
+    it('should infer content type from extension when metadata is missing', async () => {
+      const mockCtx = createMockCtx();
+      const mockObject = {
+        body: new ReadableStream(),
+      };
+      const mockBucket = createMockBucket({
+        get: vi.fn().mockResolvedValue(mockObject),
+      });
+      mockCache.match.mockResolvedValue(null);
+
+      const app = createTestApp();
+      const req = new Request('http://localhost/api/images/profile.jpg');
+      const res = await app.fetch(req, { POSTS_BUCKET: mockBucket }, mockCtx);
+
+      expect(res.status).toBe(200);
+      expect(res.headers.get('Content-Type')).toBe('image/jpeg');
+    });
+
     it('should handle nested paths correctly', async () => {
       const mockCtx = createMockCtx();
       const mockObject = {
