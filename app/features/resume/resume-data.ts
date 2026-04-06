@@ -177,5 +177,5 @@ export function parseResumeDocument(content: string): Result<ResumeData, string>
     return ok(parsed as ResumeData);
   }
 
-  return err('Resume document validation not implemented');
+  return err('Resume document validation failed');
 }
