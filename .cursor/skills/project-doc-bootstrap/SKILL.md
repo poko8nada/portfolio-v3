@@ -40,6 +40,8 @@ description: Bootstraps project documentation for an existing repository by read
 
 5. Create ADRs only when the repository contains a decision with lasting impact.
    - Use ADRs for non-obvious architecture choices, project-wide patterns, rejected alternatives, or external constraints.
+   - In this repository, also use ADRs for concrete feature contracts that must be fixed before implementation.
+   - If the user asked for planning before coding, include a short implementation plan and planned files in the ADR.
    - This is also the place for "why not" reasoning — alternatives that were considered and rejected.
    - Keep ADRs append-only and mark superseded decisions instead of rewriting history.
 
@@ -53,7 +55,7 @@ description: Bootstraps project documentation for an existing repository by read
 - Write the docs in Japanese
 - Keep `overview` focused on why the project exists
 - Keep `behavior` focused on what each feature does and whether it needs tests
-- Use ADRs only for decisions that need durable rationale
+- Use ADRs for durable rationale and for concrete pre-implementation contracts
 - Aim for docs that a fresh agent can act on without relying on prior chat context
 
 ## Related Skills

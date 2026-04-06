@@ -19,6 +19,10 @@ Agents use status fields to determine which decisions are currently active.
 This is also the canonical place for rejected alternatives — including
 feature-level "why not" reasoning that used to live in behavior documents.
 
+In this repository, ADRs are also the default place for concrete feature
+contracts that must be fixed before implementation.
+Do not create `docs/spec.md` unless the user explicitly asks for it.
+
 ## What qualifies as an ADR
 
 - Choosing between technical approaches with non-obvious trade-offs
@@ -77,7 +81,25 @@ date: YYYY-MM-DD
 ## Consequences
 
 - [この決定によって何が楽になり、何が難しくなるか。将来の決定に何を制約するか]
+
+## Initial Implementation Plan
+
+1. [実装の大枠を 3〜5 手順で書く]
+
+## Planned Files
+
+- `path/to/file`: [何を担当する予定か]
+- `path/to/file`: [何を担当する予定か]
 ```
+
+When implementation depends on concrete route paths, binding names, object keys,
+JSON shapes, print behavior, theme policy, or similar fixed values, include those
+exact values in the ADR itself.
+
+When the user asks for planning before coding, include both:
+
+- a short implementation plan
+- the planned files and their ownership
 
 ## Concreteness rule
 
@@ -95,8 +117,10 @@ Bad:
 - "skills 系の Markdown"
 - "about 用の別ルート"
 
-An ADR is not an implementation plan, but it must be specific enough that a
-fresh implementer understands the fixed boundary without additional chat.
+An ADR should not become a task-by-task checklist, but it must be specific
+enough that a fresh implementer understands both the fixed boundary and the
+intended implementation shape without additional chat.
+
 If the exact value is not yet known and implementation depends on it, ask before finalizing.
 
 ## Naming convention

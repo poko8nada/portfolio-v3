@@ -1,4 +1,5 @@
 ---
+description: TypeScript architecture (no classes, named exports), module boundaries, Result-based errors, and state patterns for app code.
 globs: "**/*.ts,**/*.tsx"
 alwaysApply: false
 ---

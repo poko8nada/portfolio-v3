@@ -1,5 +1,5 @@
 ---
-last-validated: 2026-04-01
+last-validated: 2026-04-06
 ---
 
 # Behavior
@@ -29,6 +29,22 @@ last-validated: 2026-04-01
 - **異常系**:
   - `sort` が未指定または不正 → `genre` を既定値として扱ってページを表示する
   - `resume/stack.json` の取得に失敗、または JSON 形式が不正 → エラー画面を返す
+
+## Resume ページ
+
+- **テストタイプ**: `feature`, `unit`
+- **テストファイル**: `app/routes/resume/index.test.tsx`, `app/features/resume/resume-data.test.ts`
+- **補足**: 閲覧制限は Cloudflare Access（Zero Trust）で行い、未認証・未許可のトラフィックは Workers に到達する前にブロックまたはログインへ誘導される。path 単位で運用する場合は `/resume` と `/api/resume-assets/*` を同じ保護対象に含める。アプリは HTTP Basic 認証を行わない。
+- **正常系**:
+  - Cloudflare Access を通過した状態で `/resume` にアクセス → `RESUME_ASSETS_BUCKET` の `resume/resume.json` を読み、日本の一般的な履歴書として白背景・黒文字で表示する
+  - `/resume` のレスポンス → `X-Robots-Tag: noindex, noarchive, nosnippet` を返し、head に `meta name="robots"` を含める
+  - 初期表示 → `resume-content` を `hidden` のまま出し、ページ全体に privacy overlay を重ねる
+  - privacy overlay のボタン押下 → browser 標準 confirm を通過したときだけ、0.4 秒の fade 後に `resume-content` の `hidden` を外して本文を表示する
+  - ブラウザ印刷 → その時点で表示されている DOM をそのまま印刷する
+- **異常系**:
+  - `resume/resume.json` の取得に失敗、または JSON 形式が不正 → エラー画面を返す
+  - 写真アセットが未設定、または取得に失敗 → ダミー表示を維持し、ページ全体は表示を続ける
+  - confirm をキャンセルしたまま表示を続ける → overlay を維持し、本文は hidden のままにする
 
 ## 記事一覧
 
@@ -60,11 +76,30 @@ last-validated: 2026-04-01
 - **異常系**:
   - オブジェクト不存在または取得失敗 → 404 を返す
 
+## 履歴書アセット配信 API
+
+- **テストタイプ**: `feature`
+- **テストファイル**: `app/routes/api/resume-assets/[...path].test.ts`
+- **正常系**:
+  - `/api/resume-assets/<path>` で既存アセットを要求 → `RESUME_ASSETS_BUCKET` から該当オブジェクトを返し、`Content-Type`、`ETag`、`Cache-Control`、`X-Cache`、`X-Robots-Tag` を付与する
+- **異常系**:
+  - オブジェクト不存在または取得失敗 → 404 を返す
+
 ## サイトマップ
 
 - **テストタイプ**: `feature`
-- **テストファイル**: 未作成
+- **テストファイル**: `app/routes/sitemap.xml.test.tsx`
 - **正常系**:
   - `/sitemap.xml` → API 以外の静的ルートと `POSTS_BUCKET` から列挙した記事 slug を使って XML を生成して返す
+  - `/sitemap.xml` → `/resume` と `/robots.txt` を含めない
 - **異常系**:
   - 記事 slug 一覧の取得に失敗 → 投稿 URL を含めず、静的ルートのみで XML を返す
+
+## robots.txt
+
+- **テストタイプ**: `feature`
+- **テストファイル**: `app/routes/robots.txt.test.ts`
+- **正常系**:
+  - `/robots.txt` → `Disallow: /resume`、`Disallow: /api/resume-assets/`、`Sitemap: <origin>/sitemap.xml` を返す
+- **異常系**:
+  - なし

@@ -1,4 +1,5 @@
 ---
+description: Colocated tests, what to cover versus skip, and Result-type error paths for unit and feature tests.
 globs: "**/*.test.ts,**/*.test.tsx"
 alwaysApply: false
 ---

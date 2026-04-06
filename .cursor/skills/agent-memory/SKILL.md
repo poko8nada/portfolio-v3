@@ -9,7 +9,7 @@ A lightweight persistent memory workflow for this repository.
 
 ## Location
 
-- Memory root: `.github/skills/agent-memory/memories/`
+- Memory root: `.cursor/skills/agent-memory/memories/`
 
 ## When to use
 
@@ -65,13 +65,13 @@ Use kebab-case for folder/file names.
 
 ```bash
 # list summaries quickly
-rg "^summary:" .github/skills/agent-memory/memories/ --no-ignore --hidden
+rg "^summary:" .cursor/skills/agent-memory/memories/ --no-ignore --hidden
 
 # filter by keyword
-rg "^summary:.*keyword" .github/skills/agent-memory/memories/ --no-ignore --hidden -i
+rg "^summary:.*keyword" .cursor/skills/agent-memory/memories/ --no-ignore --hidden -i
 
 # filter by tags
-rg "^tags:.*keyword" .github/skills/agent-memory/memories/ --no-ignore --hidden -i
+rg "^tags:.*keyword" .cursor/skills/agent-memory/memories/ --no-ignore --hidden -i
 ```
 
 ## Quality guidelines
