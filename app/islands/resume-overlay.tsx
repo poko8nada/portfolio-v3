@@ -26,7 +26,7 @@ const CONFIRM_MESSAGE =
 
 const SESSION_KEY = 'contract_read';
 
-export default function ResumeOvarlay() {
+export default function ResumeOverlay() {
   const [isDisplay, setIsDisplay] = useState(false);
   const [fading, setFading] = useState(false);
 
