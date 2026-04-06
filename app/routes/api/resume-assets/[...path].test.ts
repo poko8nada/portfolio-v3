@@ -60,6 +60,7 @@ describe('API /api/resume-assets/* route', () => {
     expect(res.headers.get('Content-Type')).toBe('image/png');
     expect(res.headers.get('ETag')).toBe('"resume-photo"');
     expect(res.headers.get('X-Cache')).toBe('MISS');
+    expect(res.headers.get('X-Robots-Tag')).toBe('noindex, noarchive, nosnippet');
     expect(res.headers.get('Cache-Control')).toBe('public, max-age=604800');
     expect(mockBucket.get).toHaveBeenCalledWith('resume/profile/main.png');
   });
@@ -130,5 +131,6 @@ describe('API /api/resume-assets/* route', () => {
     const res = await app.fetch(req, { RESUME_ASSETS_BUCKET: mockBucket }, mockCtx);
 
     expect(res.status).toBe(404);
+    expect(res.headers.get('X-Robots-Tag')).toBe('noindex, noarchive, nosnippet');
   });
 });

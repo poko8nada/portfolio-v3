@@ -4,6 +4,7 @@ import { getAsset } from '../../../lib/r2';
 import { isErr } from '../../../utils/types';
 
 export default createRoute(async (c) => {
+  c.header('X-Robots-Tag', 'noindex, noarchive, nosnippet');
   let path = c.req.path;
   const prefix = '/api/resume-assets/';
   if (path.startsWith(prefix)) {

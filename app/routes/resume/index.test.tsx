@@ -155,7 +155,9 @@ describe('/resume route', () => {
     const body = await response.text();
 
     expect(response.status).toBe(200);
+    expect(response.headers.get('X-Robots-Tag')).toBe('noindex, noarchive, nosnippet');
     expect(body).toContain('Resume | Poko Hanada');
+    expect(body).toContain('name="robots" content="noindex, nofollow, noarchive, nosnippet"');
     expect(body).toContain('data-resume-page-root');
     expect(body).toContain('id="resume-content"');
     expect(body).toContain('hidden=""');

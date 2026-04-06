@@ -8,6 +8,7 @@ import ResumeOvarlay from '../../islands/resume-overlay';
 export default createRoute(async (c) => {
   const title = 'Resume | Poko Hanada';
   const description = '履歴書（閲覧制限あり・Cloudflare Access）';
+  c.header('X-Robots-Tag', 'noindex, noarchive, nosnippet');
   const getResult = await getDocument(
     c.env.RESUME_ASSETS_BUCKET,
     RESUME_JSON_OBJECT_KEY,
@@ -44,6 +45,7 @@ export default createRoute(async (c) => {
     <div class={'min-h-screen relative'}>
       <title>{title}</title>
       <meta name='description' content={description} />
+      <meta name='robots' content='noindex, nofollow, noarchive, nosnippet' />
       <meta property='og:title' content={title} />
       <meta property='og:description' content={description} />
       <meta name='twitter:title' content={title} />

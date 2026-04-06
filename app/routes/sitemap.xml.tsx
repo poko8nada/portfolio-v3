@@ -7,6 +7,8 @@ const getRoutes = () => {
   const modules = import.meta.glob([
     '../routes/**/[!_]*.{ts,tsx}',
     '!../routes/api/**',
+    '!../routes/resume/**',
+    '!../routes/robots.txt.ts',
     '!../routes/**/*.test.{ts,tsx}',
     '!../routes/**/*.spec.{ts,tsx}',
     '!../routes/sitemap.xml.tsx',
@@ -26,6 +28,7 @@ const getRoutes = () => {
       // Exclude dynamic routes (e.g. /posts/[slug]) and special files (e.g. /_app)
       .filter((p) => !p.includes('/_') && !p.includes('/[') && p !== '/404')
       .filter((p) => p !== '/resume')
+      .filter((p) => p !== '/robots.txt')
       .toSorted()
   );
 };
