@@ -85,7 +85,7 @@ export function Resume(props: { data: ResumeData }) {
           <TimelineSeparator value='職　歴' />
           {experience &&
             experience.map((item) => {
-              return item.detail != '' ? (
+              return item.detail && item.detail !== '' ? (
                 <>
                   <TimelineBox
                     key={item.value}
