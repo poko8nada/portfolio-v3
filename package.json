@@ -12,7 +12,7 @@
     "deploy:prod": "pnpm run rebuild && wrangler deploy --env=production",
     "deploy:staging": "pnpm run rebuild && wrangler deploy --env=staging",
     "test": "vitest",
-    "test:run": "vitest run && pnpm run build",
+    "test:run": "vitest run",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
     "format": "oxfmt .",
