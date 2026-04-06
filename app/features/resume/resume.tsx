@@ -122,7 +122,13 @@ export function Resume(props: { data: ResumeData }) {
             <div class={'text-sm text-center col-span-1 border-r'}>月</div>
             <div class={'text-sm text-center col-span-10'}>免許・資格など</div>
           </div>
-          <TimelineBox year={licenses[0].year} month={licenses[0].month} text={licenses[0].value} />
+          {licenses.length > 0 && (
+            <TimelineBox
+              year={licenses[0].year}
+              month={licenses[0].month}
+              text={licenses[0].value}
+            />
+          )}
           <TimelineSeparator value='' />
           <TimelineSeparator value='以　上' />
           <TimelineSeparator value='' />
