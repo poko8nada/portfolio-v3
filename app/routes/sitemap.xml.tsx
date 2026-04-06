@@ -25,6 +25,7 @@ const getRoutes = () => {
       })
       // Exclude dynamic routes (e.g. /posts/[slug]) and special files (e.g. /_app)
       .filter((p) => !p.includes('/_') && !p.includes('/[') && p !== '/404')
+      .filter((p) => p !== '/resume')
       .toSorted()
   );
 };

@@ -1,4 +1,5 @@
 ---
+description: Tailwind CSS v4 tokens, component structure, responsive layout, and accessibility conventions for TSX and CSS in this repo.
 globs: "**/*.tsx,**/*.css"
 alwaysApply: false
 ---
