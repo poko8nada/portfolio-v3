@@ -1,7 +1,38 @@
 import { describe, expect, it } from 'vitest';
-import resumeFixture from '../../../seeds/resume-assets/resume/resume.json';
 import { isErr, isOk } from '../../utils/types';
 import { parseResumeDocument } from './resume-data';
+
+const RESUME_FIXTURE = {
+  profile: {
+    date: '2026-04-01',
+    nameKana: 'テスト タロウ',
+    name: 'テスト 太郎',
+    birthDay: '1990-01-01',
+    age: '36',
+    gender: '男',
+    cellPhone: '000-0000-0000',
+    email: 't@example.com',
+  },
+  address: {
+    zip: '810-0001',
+    kana: 'フクオカケン',
+    value: '福岡県福岡市',
+    tel: '092-000-0000',
+    fax: '',
+  },
+  education: [{ year: '2009', month: '3', value: '高校卒業' }],
+  experience: [{ year: '2010', month: '4', value: '入社', detail: '業務担当' }],
+  licenses: [],
+  awards: [],
+  supporting: {
+    dependents: '0',
+    spouse: '無',
+    supportingSpouse: '無',
+  },
+  extraSkills: [],
+  motivation: '志望動機',
+  request: '本人希望',
+};
 
 const MINIMAL_VALID = JSON.stringify({
   profile: {
@@ -95,11 +126,11 @@ describe('parseResumeDocument', () => {
     expect(isErr(result)).toBe(true);
   });
 
-  it('accepts the checked-in seed resume JSON', () => {
-    const result = parseResumeDocument(JSON.stringify(resumeFixture));
+  it('accepts a complete resume fixture', () => {
+    const result = parseResumeDocument(JSON.stringify(RESUME_FIXTURE));
     expect(isOk(result)).toBe(true);
     if (isOk(result)) {
-      expect(result.value.profile.name).toBe(resumeFixture.profile.name);
+      expect(result.value.profile.name).toBe(RESUME_FIXTURE.profile.name);
       expect(result.value.experience.length).toBeGreaterThan(0);
       const firstExp = result.value.experience[0];
       expect(firstExp?.detail?.length).toBeGreaterThan(0);

@@ -8,10 +8,12 @@ import { parseMarkdown } from '../../lib/markdown';
 import { getPost } from '../../lib/r2';
 import { isErr } from '../../utils/types';
 
+const isPostNotFoundError = (error: string) => error.startsWith('Post not found:');
+
 export default createRoute(async (c) => {
   const slug = c.req.param('slug');
   if (!slug) {
-    return c.render(<div>Error: Missing slug parameter</div>);
+    return c.notFound();
   }
 
   const bucket = c.env.POSTS_BUCKET;
@@ -21,6 +23,11 @@ export default createRoute(async (c) => {
   });
 
   if (isErr(getResult)) {
+    if (isPostNotFoundError(getResult.error)) {
+      return c.notFound();
+    }
+
+    c.status(500);
     return c.render(
       <div>
         <title>Error | Poko Hanada</title>
@@ -30,28 +37,17 @@ export default createRoute(async (c) => {
   }
 
   const { content, fromCache } = getResult.value;
-  // Set X-Cache header to indicate if the R2 content was served from cache
   c.header('X-Cache', fromCache ? 'HIT' : 'MISS');
 
   const parseResult = await parseMarkdown(content);
   if (isErr(parseResult)) {
-    return c.render(
-      <div>
-        <title>Error | Poko Hanada</title>
-        Error: {parseResult.error}
-      </div>,
-    );
+    return c.notFound();
   }
 
   const postData = parseResult.value;
 
   if (!postData.isPublished) {
-    return c.render(
-      <div>
-        <title>Not Published | Poko Hanada</title>
-        This post is not published.
-      </div>,
-    );
+    return c.notFound();
   }
 
   const title = `${postData.title} | Poko Hanada`;
